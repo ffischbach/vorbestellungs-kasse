@@ -35,9 +35,7 @@ async def import_csv(
         content = (await file.read()).decode("utf-8")
         service = CsvImportService()
         count = service.import_to_db(content, db, replace=replace)
-        return templates.TemplateResponse(
-            request, "partials/import_result.html", {"count": count}
-        )
+        return templates.TemplateResponse(request, "partials/import_result.html", {"count": count})
     except Exception as e:
         return templates.TemplateResponse(
             request, "partials/import_result.html", {"error": str(e)}, status_code=400

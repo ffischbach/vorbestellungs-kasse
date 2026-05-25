@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import or_
+from sqlalchemy import ColumnElement, or_
 from sqlalchemy.orm import Session
 
 from app.models.order import Order
@@ -12,7 +12,7 @@ class OrderRepository:
 
     def search(self, query: str) -> list[Order]:
         q = f"%{query}%"
-        filters = [
+        filters: list[ColumnElement[bool]] = [
             Order.first_name.ilike(q),
             Order.last_name.ilike(q),
             Order.email.ilike(q),
@@ -71,7 +71,5 @@ class OrderRepository:
                 "picked_up": picked.get(slot, 0),
                 "open": total - picked.get(slot, 0),
             }
-            for slot, total in sorted(
-                totals.items(), key=lambda x: (x[0] is None, x[0] or "")
-            )
+            for slot, total in sorted(totals.items(), key=lambda x: (x[0] is None, x[0] or ""))
         ]

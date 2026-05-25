@@ -1,5 +1,5 @@
 import os
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from app.config import settings
 from app.models.order import Order
@@ -54,7 +54,7 @@ class PrinterService:
 
         p.text("─" * 32 + "\n")
 
-        ts = order.picked_up_at or datetime.now(timezone.utc)
+        ts = order.picked_up_at or datetime.now(UTC)
         p.text(f"Abgeholt: {ts.strftime('%d.%m.%Y  %H:%M')}\n")
         p.text(f"Bon-Nr.:  #{order.order_id}\n")
 

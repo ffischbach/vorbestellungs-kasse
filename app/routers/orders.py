@@ -45,9 +45,7 @@ async def overview(request: Request, db: Session = Depends(get_db)) -> HTMLRespo
 
 
 @router.post("/orders/{order_id}/pickup", response_class=HTMLResponse)
-async def pickup(
-    request: Request, order_id: int, db: Session = Depends(get_db)
-) -> HTMLResponse:
+async def pickup(request: Request, order_id: int, db: Session = Depends(get_db)) -> HTMLResponse:
     service = OrderService(db)
     try:
         order, printer_error = service.pickup(order_id)
@@ -64,9 +62,7 @@ async def pickup(
 
 
 @router.post("/orders/{order_id}/reprint", response_class=HTMLResponse)
-async def reprint(
-    request: Request, order_id: int, db: Session = Depends(get_db)
-) -> HTMLResponse:
+async def reprint(request: Request, order_id: int, db: Session = Depends(get_db)) -> HTMLResponse:
     service = OrderService(db)
     try:
         order, printer_error = service.reprint(order_id)

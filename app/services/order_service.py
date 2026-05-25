@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from sqlalchemy.orm import Session
 
@@ -61,11 +61,9 @@ class OrderService:
         if not order:
             raise OrderNotFoundError(f"Bestellung #{order_id} nicht gefunden")
         if order.picked_up:
-            raise OrderAlreadyPickedUpError(
-                f"Bestellung #{order_id} wurde bereits abgeholt"
-            )
+            raise OrderAlreadyPickedUpError(f"Bestellung #{order_id} wurde bereits abgeholt")
 
-        order = self.repo.mark_picked_up(order, datetime.now(timezone.utc))
+        order = self.repo.mark_picked_up(order, datetime.now(UTC))
 
         printer_error: str | None = None
         try:

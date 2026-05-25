@@ -1,6 +1,6 @@
 import asyncio
 import json
-from typing import AsyncGenerator
+from collections.abc import AsyncGenerator
 
 from fastapi import APIRouter
 from fastapi.responses import StreamingResponse
