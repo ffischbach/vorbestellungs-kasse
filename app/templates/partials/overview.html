@@ -1,0 +1,29 @@
+{% if by_time %}
+<div class="slot-list">
+    {% for slot in by_time %}
+    <div class="slot-row">
+        <div class="slot-row__head">
+            <span class="slot-row__time">{{ slot.abholzeit }}</span>
+            {% if slot.open == 0 %}
+                <span class="slot-row__open slot-row__open--done">Alle abgeholt</span>
+            {% else %}
+                <span class="slot-row__open">{{ slot.open }} offen</span>
+            {% endif %}
+        </div>
+        <div class="slot-row__bar">
+            <div class="slot-row__fill"
+                 style="width:{{ (slot.picked_up / slot.total * 100)|round|int if slot.total > 0 else 0 }}%">
+            </div>
+        </div>
+        <div class="slot-row__meta">
+            <span>{{ slot.picked_up }} abgeholt</span>
+            <span>{{ slot.total }} gesamt</span>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<p class="text-center py-10 text-tertiary" style="font-size:var(--text-lg);">
+    Noch keine Bestellungen importiert.
+</p>
+{% endif %}

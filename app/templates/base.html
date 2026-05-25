@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Fischerfest Kassensystem{% endblock %}</title>
+    <link rel="stylesheet" href="/static/tailwind.min.css">
+    <link rel="stylesheet" href="/static/app.css">
+    <script src="/static/htmx.min.js"></script>
+    <script src="/static/alpine.min.js" defer></script>
+</head>
+<body class="min-h-screen">
+    <header class="app-header">
+        <div class="app-header__inner">
+            <span class="app-header__title">Fischerfest</span>
+            <div class="app-header__actions">
+                <div
+                    id="printer-status"
+                    hx-get="/admin/status"
+                    hx-trigger="load, every 30s"
+                    hx-swap="innerHTML"
+                >
+                    <span class="status-pill status-pill--offline">Drucker …</span>
+                </div>
+                <a href="/admin" class="app-header__link">Admin</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-3xl mx-auto p-4">
+        {% block content %}{% endblock %}
+    </main>
+</body>
+</html>

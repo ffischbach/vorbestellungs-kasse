@@ -1,0 +1,159 @@
+<div class="order-card {% if order.picked_up %}order-card--done{% endif %}" data-order-card>
+    <div class="order-card__body">
+        <div class="order-card__head">
+            <span class="order-card__name">{{ order.first_name }} {{ order.last_name }}</span>
+            <span class="order-card__id">#{{ order.order_id }}</span>
+        </div>
+
+        {% if order.abholzeit or order.togo %}
+        <div class="order-card__badges">
+            {% if order.abholzeit %}<span class="badge badge-blue">{{ order.abholzeit }}</span>{% endif %}
+            {% if order.togo %}<span class="badge badge-orange">To-Go</span>{% endif %}
+        </div>
+        {% endif %}
+
+        <ul class="order-card__items">
+            {% for item in order.items %}
+            <li>
+                <span class="order-card__qty">{{ item.quantity }}×</span>
+                {{ item.name }}
+            </li>
+            {% endfor %}
+        </ul>
+
+        <div class="order-card__price">{{ "%.2f"|format(order.net_total|float) }}&thinsp;€</div>
+    </div>
+
+    <div class="order-card__foot">
+        {% if order.picked_up %}
+        <div class="order-card__done-footer">
+            <span class="order-card__done-label">
+                Abgeholt · {{ order.picked_up_at.strftime("%H:%M") if order.picked_up_at else "" }}
+            </span>
+            <button
+                class="btn-reprint"
+                hx-post="/orders/{{ order.order_id }}/reprint"
+                hx-target="closest [data-order-card]"
+                hx-swap="outerHTML"
+                hx-disabled-elt="this"
+            >
+                ↺ Bon
+            </button>
+        </div>
+        {% else %}
+        <div x-data="{
+            open: false,
+            amount: '',
+            total: {{ order.net_total | float }},
+            get paid() { return parseFloat(this.amount.replace(',', '.')) || 0; },
+            get change() { return Math.round((this.paid - this.total) * 100) / 100; },
+            get isValid() { return this.paid >= this.total - 0.005; },
+            quickAmounts() {
+                const t = this.total;
+                function ceilTo(v, s) { return Math.ceil(v / s) * s; }
+                const c = [ceilTo(t, 5), ceilTo(t, 10), ceilTo(t, 20), ceilTo(t, 50), 100, 200];
+                return [...new Set(c)].filter(x => x >= t - 0.001).sort((a, b) => a - b).slice(0, 4);
+            }
+        }">
+            <button class="order-card__action" @click="open = true; amount = ''">
+                Abholen
+            </button>
+
+            <div x-show="open" x-cloak
+                 x-transition:enter="transition-opacity duration-200"
+                 x-transition:enter-start="opacity-0"
+                 x-transition:enter-end="opacity-100"
+                 x-transition:leave="transition-opacity duration-150"
+                 x-transition:leave-start="opacity-100"
+                 x-transition:leave-end="opacity-0"
+                 class="pay-overlay"
+                 @click.self="open = false"
+                 @keydown.escape.window="open = false">
+                <div class="pay-sheet" role="dialog" aria-modal="true">
+
+                    <div class="pay-sheet__header">
+                        <span class="pay-sheet__title">Abholung bestätigen</span>
+                        <span class="pay-sheet__order">#{{ order.order_id }} · {{ order.first_name }} {{ order.last_name }}</span>
+                    </div>
+
+                    <div class="pay-sheet__total">
+                        <span class="pay-sheet__total-label">Zu zahlen</span>
+                        <span class="pay-sheet__total-amount">{{ "%.2f"|format(order.net_total|float) }}&thinsp;€</span>
+                    </div>
+
+                    <div class="pay-sheet__quick">
+                        <button class="pay-chip pay-chip--exact"
+                                @click="amount = total.toFixed(2).replace('.', ',')"
+                                :class="{ 'pay-chip--active': isValid && change === 0 }">
+                            Genau
+                        </button>
+                        <template x-for="qa in quickAmounts()" :key="qa">
+                            <button class="pay-chip"
+                                    @click="amount = qa.toFixed(2).replace('.', ',')"
+                                    :class="{ 'pay-chip--active': Math.abs(paid - qa) < 0.001 }">
+                                <span x-text="qa.toLocaleString('de-DE', { minimumFractionDigits: 0 }) + ' €'"></span>
+                            </button>
+                        </template>
+                    </div>
+
+                    <div class="pay-sheet__input-row">
+                        <label class="pay-sheet__input-label" for="pay-input-{{ order.order_id }}">Erhalten</label>
+                        <input
+                            id="pay-input-{{ order.order_id }}"
+                            type="text"
+                            inputmode="decimal"
+                            placeholder="0,00"
+                            x-model="amount"
+                            @focus="$el.select()"
+                            class="pay-input"
+                        >
+                    </div>
+
+                    <div x-show="amount.trim() !== ''" class="pay-sheet__change">
+                        <span class="pay-sheet__change-label">Rückgeld</span>
+                        <span class="pay-sheet__change-amount"
+                              :class="isValid ? 'pay-change--ok' : 'pay-change--err'"
+                              x-text="isValid
+                                  ? change.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €'
+                                  : '– zu wenig –'">
+                        </span>
+                    </div>
+
+                    <div class="pay-sheet__actions">
+                        <button
+                            class="pay-sheet__confirm"
+                            :disabled="!isValid"
+                            @click="open = false"
+                            hx-post="/orders/{{ order.order_id }}/pickup"
+                            hx-target="closest [data-order-card]"
+                            hx-swap="outerHTML"
+                            hx-disabled-elt="this"
+                        >
+                            Abholen &amp; Bon drucken
+                        </button>
+                        <button class="pay-sheet__cancel" @click="open = false">
+                            Abbrechen
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    {% if printer_error is defined and printer_error %}
+    <div class="alert alert-warning order-card__warning">
+        <span>Bon konnte nicht gedruckt werden: {{ printer_error }}</span>
+        <button
+            class="btn-reprint-alert"
+            hx-post="/orders/{{ order.order_id }}/reprint"
+            hx-target="closest [data-order-card]"
+            hx-swap="outerHTML"
+            hx-disabled-elt="this"
+        >
+            ↺ Nochmals drucken
+        </button>
+    </div>
+    {% endif %}
+</div>

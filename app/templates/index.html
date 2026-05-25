@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="mb-4">
+    <div
+        id="stats"
+        hx-get="/orders/stats"
+        hx-trigger="load, every 15s, pickup"
+        hx-swap="innerHTML"
+    ></div>
+</div>
+
+<div x-data="{ tab: 'search' }">
+    <div class="tab-bar mb-4">
+        <button class="tab-btn" :class="{ 'tab-btn--active': tab === 'search' }" @click="tab = 'search'">
+            Suche
+        </button>
+        <button class="tab-btn" :class="{ 'tab-btn--active': tab === 'overview' }" @click="tab = 'overview'">
+            Übersicht
+        </button>
+    </div>
+
+    <div x-show="tab === 'search'">
+        <div class="card mb-4" style="padding:0; overflow:hidden;">
+            <input
+                type="search"
+                name="q"
+                placeholder="Name, E-Mail oder Bestellnummer …"
+                class="input-search"
+                style="border:none; border-radius:var(--radius-lg);"
+                hx-get="/orders/search"
+                hx-trigger="input changed delay:200ms, search"
+                hx-target="#results"
+                hx-swap="innerHTML"
+                autocomplete="off"
+                autofocus
+            >
+        </div>
+        <div id="results" class="space-y-3">
+            <p class="text-center py-10 text-tertiary" style="font-size:var(--text-lg);">
+                Suchbegriff eingeben …
+            </p>
+        </div>
+    </div>
+
+    <div x-show="tab === 'overview'" x-cloak>
+        <div
+            id="overview-content"
+            hx-get="/orders/overview"
+            hx-trigger="load, pickup"
+            hx-swap="innerHTML"
+        ></div>
+    </div>
+</div>
+
+<div style="display:none;" x-data x-init="
+    const es = new EventSource('/events');
+    es.onmessage = e => {
+        const d = JSON.parse(e.data);
+        if (d.type === 'pickup') {
+            htmx.trigger(document.getElementById('stats'), 'pickup');
+            const ov = document.getElementById('overview-content');
+            if (ov) htmx.trigger(ov, 'pickup');
+        }
+    };
+"></div>
+{% endblock %}

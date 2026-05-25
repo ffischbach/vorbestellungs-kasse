@@ -1,0 +1,24 @@
+<div class="stats-panel">
+    <div class="stats-row">
+        <div class="stat-item stat-item--green">
+            <div class="stat-item__value">{{ stats.picked_up }}</div>
+            <div class="stat-item__label">Abgeholt</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-item__value">{{ stats.open }}</div>
+            <div class="stat-item__label">Offen</div>
+        </div>
+        <div class="stat-item stat-item--muted">
+            <div class="stat-item__value">{{ stats.total }}</div>
+            <div class="stat-item__label">Gesamt</div>
+        </div>
+    </div>
+    {% if stats.total > 0 %}
+    <div class="stats-progress">
+        <div class="stats-progress__bar">
+            <div class="stats-progress__fill" style="width:{{ (stats.picked_up / stats.total * 100)|round|int }}%"></div>
+        </div>
+        <span class="stats-progress__pct">{{ (stats.picked_up / stats.total * 100)|round|int }}&thinsp;%</span>
+    </div>
+    {% endif %}
+</div>

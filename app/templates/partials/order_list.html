@@ -1,0 +1,9 @@
+{% if orders %}
+    {% for order in orders %}
+        {% include "partials/order_card.html" %}
+    {% endfor %}
+{% elif query %}
+    <p class="text-center py-10 text-tertiary" style="font-size:var(--text-lg);">
+        Keine Bestellung gefunden für „{{ query }}"
+    </p>
+{% endif %}

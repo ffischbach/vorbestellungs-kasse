@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block title %}Admin – Fischerfest{% endblock %}
+
+{% block content %}
+<div class="mb-5 flex items-center gap-3">
+    <a href="/" class="btn btn-ghost">← Kasse</a>
+    <span style="font-size:var(--text-lg);font-weight:var(--font-bold);">Administration</span>
+</div>
+
+<div class="card mb-4">
+    <p style="font-size:var(--text-xs);font-weight:var(--font-semibold);color:var(--color-text-tertiary);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:var(--space-3);">
+        Bestellungen importieren
+    </p>
+    <p class="text-muted mb-4" style="font-size:var(--text-sm);">
+        CSV-Export aus WooCommerce hochladen. Bestehende Daten werden ersetzt.
+    </p>
+
+    <form
+        hx-post="/admin/import"
+        hx-target="#import-result"
+        hx-swap="innerHTML"
+        hx-encoding="multipart/form-data"
+        hx-indicator="#import-spinner"
+    >
+        <div class="flex flex-col sm:flex-row gap-3 items-start">
+            <input type="file" name="file" accept=".csv,.txt" required class="input-file">
+            <button type="submit" class="btn btn-secondary flex-shrink-0">Importieren</button>
+        </div>
+        <span id="import-spinner" class="htmx-indicator text-muted mt-2 block" style="font-size:var(--text-sm);">
+            Wird importiert…
+        </span>
+    </form>
+
+    <div id="import-result"></div>
+</div>
+
+<div class="card">
+    <p style="font-size:var(--text-xs);font-weight:var(--font-semibold);color:var(--color-text-tertiary);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:var(--space-4);">
+        Aktueller Stand
+    </p>
+    <div hx-get="/orders/stats" hx-trigger="load, every 10s" hx-swap="innerHTML"></div>
+</div>
+{% endblock %}

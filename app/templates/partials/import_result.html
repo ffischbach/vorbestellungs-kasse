@@ -1,0 +1,9 @@
+{% if error %}
+    <div class="alert alert-danger mt-3">
+        Import fehlgeschlagen: {{ error }}
+    </div>
+{% else %}
+    <div class="alert alert-success mt-3">
+        {{ count }} Bestellung{{ 'en' if count != 1 else '' }} erfolgreich importiert.
+    </div>
+{% endif %}
