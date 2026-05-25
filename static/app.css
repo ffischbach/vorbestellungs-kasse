@@ -633,7 +633,22 @@ body {
   width: 100%;
   max-width: 34rem;
   border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-  padding: var(--space-6) var(--space-5) var(--space-6);
+  padding: var(--space-6) var(--space-5) calc(var(--space-6) + env(safe-area-inset-bottom, 0px));
+  max-height: 92vh;
+  max-height: 92dvh;
+  overflow-y: auto;
+}
+
+@media (min-width: 600px) {
+  .pay-overlay {
+    align-items: center;
+  }
+  .pay-sheet {
+    border-radius: var(--radius-lg);
+    margin: var(--space-4);
+    max-height: 96vh;
+    max-height: 96dvh;
+  }
 }
 
 .pay-sheet__header {
@@ -683,12 +698,13 @@ body {
 
 .pay-sheet__quick {
   display: flex;
+  flex-wrap: wrap;
   gap: var(--space-2);
   margin-bottom: var(--space-4);
 }
 
 .pay-chip {
-  flex: 1;
+  flex: 1 1 64px;
   padding: var(--space-3) var(--space-2);
   border: 1.5px solid var(--color-border);
   border-radius: var(--radius-md);
@@ -740,6 +756,7 @@ body {
 
 .pay-input {
   flex: 1;
+  min-width: 0;
   font-family: var(--font-family);
   font-size: var(--text-2xl);
   font-weight: var(--font-bold);
@@ -855,6 +872,25 @@ body {
 .duration-150       { transition-duration: 150ms; transition-timing-function: ease; }
 .opacity-0          { opacity: 0; }
 .opacity-100        { opacity: 1; }
+
+/* --- FLASH TOAST --- */
+#flash {
+  position: fixed;
+  top: var(--space-5);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9999;
+  width: calc(100% - var(--space-8));
+  max-width: 34rem;
+  pointer-events: none;
+}
+
+#flash .alert {
+  pointer-events: auto;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.14);
+  font-size: var(--text-base);
+  font-weight: var(--font-semibold);
+}
 
 /* --- ALPINE X-CLOAK --- */
 [x-cloak] { display: none !important; }
