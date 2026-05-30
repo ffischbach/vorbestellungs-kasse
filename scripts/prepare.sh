@@ -6,31 +6,54 @@
 set -euo pipefail
 
 INSTALL_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-SERVICE_NAME="fischverkauf"
+SERVICE_NAME="vorbestellungs-kasse"
 VENV_DIR="$INSTALL_DIR/.venv"
 PI_USER="${SUDO_USER:-pi}"
 
-# WLAN-Hotspot-Einstellungen – hier anpassen falls gewünscht
-HOTSPOT_SSID="Anglerverein"
-HOTSPOT_PASSWORD="Fischerfest2025"
+# Helper: einzelnen Wert aus .env lesen
+_env_val() {
+    grep -E "^$1=" "$INSTALL_DIR/.env" 2>/dev/null | cut -d'=' -f2- | tr -d '"' | tr -d "'"
+}
 
-echo "=== Fischerfest Kassensystem – Vorbereitung ==="
+echo "=== Vorbestellungs-Kasse – Vorbereitung ==="
 echo "Verzeichnis: $INSTALL_DIR"
 echo ""
 
 cd "$INSTALL_DIR"
 
-# Hostname setzen (ermöglicht ssh pi@fischerfest.local)
+# .env anlegen bevor andere Schritte daraus lesen
+echo "[0/7] Konfigurationsdatei prüfen..."
+if [ ! -f "$INSTALL_DIR/.env" ]; then
+    cp "$INSTALL_DIR/.env.example" "$INSTALL_DIR/.env"
+    echo "      .env aus Vorlage erstellt."
+    echo ""
+    echo "  WICHTIG: $INSTALL_DIR/.env öffnen und mindestens diese Werte anpassen:"
+    echo "    PI_HOSTNAME   – Netzwerkname des Raspberry Pi (z.B. 'meinverein-kasse')"
+    echo "    HOTSPOT_SSID  – WLAN-Name des Hotspots"
+    echo "    HOTSPOT_PASSWORD – WLAN-Passwort"
+    echo "    VEREINSNAME, EVENT_NAME, EVENT_JAHR"
+    echo ""
+    echo "  Danach prepare.sh erneut ausführen."
+    echo ""
+else
+    echo "      .env vorhanden."
+fi
+
+# Infra-Einstellungen aus .env lesen (mit Fallbacks)
+PI_HOSTNAME="$(_env_val PI_HOSTNAME)"; PI_HOSTNAME="${PI_HOSTNAME:-kasse}"
+HOTSPOT_SSID="$(_env_val HOTSPOT_SSID)"; HOTSPOT_SSID="${HOTSPOT_SSID:-MeinVerein}"
+HOTSPOT_PASSWORD="$(_env_val HOTSPOT_PASSWORD)"; HOTSPOT_PASSWORD="${HOTSPOT_PASSWORD:-MeinPasswort}"
+
+# Hostname setzen (ermöglicht z.B. ssh pi@kasse.local)
 echo "[1/7] Hostname setzen..."
 CURRENT_HOSTNAME=$(hostname)
-if [ "$CURRENT_HOSTNAME" != "fischerfest" ]; then
-    sudo hostnamectl set-hostname fischerfest
-    # /etc/hosts aktualisieren damit localhost-Auflösung nicht bricht
-    sudo sed -i "s/\b$CURRENT_HOSTNAME\b/fischerfest/g" /etc/hosts
-    echo "      Hostname geändert: $CURRENT_HOSTNAME → fischerfest"
-    echo "      Erreichbar nach Neustart als: ssh pi@fischerfest.local"
+if [ "$CURRENT_HOSTNAME" != "$PI_HOSTNAME" ]; then
+    sudo hostnamectl set-hostname "$PI_HOSTNAME"
+    sudo sed -i "s/\b$CURRENT_HOSTNAME\b/$PI_HOSTNAME/g" /etc/hosts
+    echo "      Hostname geändert: $CURRENT_HOSTNAME → $PI_HOSTNAME"
+    echo "      Erreichbar nach Neustart als: ssh pi@${PI_HOSTNAME}.local"
 else
-    echo "      Hostname bereits 'fischerfest' – keine Änderung."
+    echo "      Hostname bereits '$PI_HOSTNAME' – keine Änderung."
 fi
 
 # Drucker-Berechtigung setzen (Gruppe lp)
@@ -56,18 +79,13 @@ echo "[4/7] Datenverzeichnis anlegen..."
 mkdir -p "$INSTALL_DIR/data"
 echo "      OK"
 
-# .env anlegen falls nicht vorhanden
-echo "[5/7] Konfiguration prüfen..."
-if [ ! -f "$INSTALL_DIR/.env" ]; then
-    cp "$INSTALL_DIR/.env.example" "$INSTALL_DIR/.env"
-    echo "      .env aus Vorlage erstellt."
-    echo ""
-    echo "  WICHTIG: Bitte jetzt $INSTALL_DIR/.env öffnen und"
-    echo "  VEREINSNAME, EVENT_JAHR und PRINTER_DEVICE prüfen."
-    echo ""
-else
-    echo "      .env bereits vorhanden – keine Änderung."
-fi
+# Aktuelle Konfiguration anzeigen
+echo "[5/7] Konfiguration..."
+echo "      PI_HOSTNAME   = $PI_HOSTNAME"
+echo "      HOTSPOT_SSID  = $HOTSPOT_SSID"
+echo "      EVENT_NAME    = $(_env_val EVENT_NAME)"
+echo "      VEREINSNAME   = $(_env_val VEREINSNAME)"
+echo "      Zum Ändern: $INSTALL_DIR/.env bearbeiten, dann prepare.sh erneut ausführen."
 
 # WLAN-Hotspot einrichten (wird beim Booten automatisch aktiviert)
 echo "[6/7] WLAN-Hotspot einrichten..."
@@ -88,8 +106,7 @@ fi
 
 # systemd-Service installieren und für Auto-Start aktivieren
 echo "[7/7] systemd-Service installieren..."
-# Pfad-Platzhalter im Service-Template durch tatsächliches Installationsverzeichnis ersetzen
-sudo sed "s|/home/pi/fischverkauf|$INSTALL_DIR|g" \
+sudo sed "s|/home/pi/vorbestellungs-kasse|$INSTALL_DIR|g" \
     "$INSTALL_DIR/systemd/$SERVICE_NAME.service" \
     | sudo tee /etc/systemd/system/$SERVICE_NAME.service > /dev/null
 sudo systemctl daemon-reload
