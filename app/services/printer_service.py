@@ -20,7 +20,10 @@ class PrinterService:
             from escpos.printer import File  # type: ignore[import]
 
             printer = File(settings.printer_device)
-            self._write_receipt(printer, order)
+            try:
+                self._write_receipt(printer, order)
+            finally:
+                printer.close()
         except ImportError as e:
             raise PrinterNotAvailableError("python-escpos nicht installiert") from e
         except Exception as e:
