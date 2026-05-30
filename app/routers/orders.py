@@ -44,7 +44,9 @@ async def overview(request: Request, db: Session = Depends(get_db)) -> HTMLRespo
 
 
 @router.get("/orders/{order_id}/card", response_class=HTMLResponse)
-async def order_card(request: Request, order_id: int, db: Session = Depends(get_db)) -> HTMLResponse:
+async def order_card(
+    request: Request, order_id: int, db: Session = Depends(get_db)
+) -> HTMLResponse:
     service = OrderService(db)
     try:
         order = service.get_by_id(order_id)
