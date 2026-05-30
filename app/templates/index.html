@@ -1,6 +1,11 @@
 {% extends "base.html" %}
 
 {% block content %}
+<script>
+document.addEventListener('alpine:init', () => {
+    Alpine.store('overview', { subtab: 'zeitfenster' });
+});
+</script>
 <div class="mb-4">
     <div
         id="stats"

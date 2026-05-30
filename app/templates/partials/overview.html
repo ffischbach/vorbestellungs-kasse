@@ -1,13 +1,13 @@
-<div x-data="{ subtab: 'zeitfenster' }">
+<div>
     <div class="tab-bar tab-bar--sm mb-4">
-        <button class="tab-btn" :class="{'tab-btn--active': subtab==='zeitfenster'}" @click="subtab='zeitfenster'">Zeitfenster</button>
-        <button class="tab-btn" :class="{'tab-btn--active': subtab==='offen'}" @click="subtab='offen'">Offen ({{ open_orders|length }})</button>
-        <button class="tab-btn" :class="{'tab-btn--active': subtab==='produkte'}" @click="subtab='produkte'">Produkte</button>
-        <button class="tab-btn" :class="{'tab-btn--active': subtab==='zuletzt'}" @click="subtab='zuletzt'">Zuletzt</button>
+        <button class="tab-btn" :class="{'tab-btn--active': $store.overview.subtab==='zeitfenster'}" @click="$store.overview.subtab='zeitfenster'">Zeitfenster</button>
+        <button class="tab-btn" :class="{'tab-btn--active': $store.overview.subtab==='offen'}" @click="$store.overview.subtab='offen'">Offen ({{ open_orders|length }})</button>
+        <button class="tab-btn" :class="{'tab-btn--active': $store.overview.subtab==='produkte'}" @click="$store.overview.subtab='produkte'">Produkte</button>
+        <button class="tab-btn" :class="{'tab-btn--active': $store.overview.subtab==='zuletzt'}" @click="$store.overview.subtab='zuletzt'">Zuletzt</button>
     </div>
 
     <!-- Zeitfenster -->
-    <div x-show="subtab === 'zeitfenster'">
+    <div x-cloak x-show="$store.overview.subtab === 'zeitfenster'">
         {% if by_time %}
         <div class="slot-list">
             {% for slot in by_time %}
@@ -40,7 +40,7 @@
     </div>
 
     <!-- Offene Bestellungen -->
-    <div x-show="subtab === 'offen'" x-cloak>
+    <div x-cloak x-show="$store.overview.subtab === 'offen'">
         {% if open_orders %}
         <div class="open-order-list">
             {% for order in open_orders %}
@@ -71,7 +71,7 @@
     </div>
 
     <!-- Produkte noch ausstehend -->
-    <div x-show="subtab === 'produkte'" x-cloak>
+    <div x-cloak x-show="$store.overview.subtab === 'produkte'">
         {% if product_totals %}
         <div class="product-total-list">
             {% for p in product_totals %}
@@ -89,7 +89,7 @@
     </div>
 
     <!-- Zuletzt abgeholt -->
-    <div x-show="subtab === 'zuletzt'" x-cloak>
+    <div x-cloak x-show="$store.overview.subtab === 'zuletzt'">
         {% if recent_pickups %}
         <div class="recent-pickup-list">
             {% for order in recent_pickups %}
