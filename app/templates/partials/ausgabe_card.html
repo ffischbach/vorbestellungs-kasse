@@ -1,33 +1,21 @@
-<div class="ausgabe-card" id="ausgabe-card-{{ order.order_id }}" x-data="{ loading: false }">
-    <div class="ausgabe-card__body">
-        <div class="ausgabe-card__head">
-            <span class="ausgabe-card__name">{{ order.first_name }} {{ order.last_name }}</span>
-            <span class="ausgabe-card__id">#{{ order.order_id }}</span>
+<div class="ausgabe-card-compact" id="ausgabe-card-{{ order.order_id }}" x-data="{ loading: false }">
+    <div class="ausgabe-card-compact__body">
+        <div class="ausgabe-card-compact__head">
+            <span class="ausgabe-card-compact__id">#{{ order.order_id }}</span>
+            <div class="ausgabe-card-compact__badges">
+                {% if order.togo %}<span class="badge badge-orange">To-Go</span>{% endif %}
+                {% if order.abholzeit %}<span class="badge badge-blue">{{ order.abholzeit }}</span>{% endif %}
+            </div>
         </div>
-        <div class="ausgabe-card__badges">
-            {% if order.abholzeit %}
-            <span class="badge badge-blue">{{ order.abholzeit }}</span>
-            {% endif %}
-            {% if order.togo %}
-            <span class="badge badge-orange">To-Go</span>
-            {% endif %}
-        </div>
-        <ul class="ausgabe-card__items">
+        <div class="ausgabe-card-compact__name">{{ order.first_name }} {{ order.last_name }}</div>
+        <ul class="ausgabe-card-compact__items">
             {% for item in order.items %}
-            <li>
-                <span class="ausgabe-card__qty">{{ item.quantity }}×</span>
-                <span>{{ item.name }}</span>
-            </li>
+            <li><span class="ausgabe-card-compact__qty">{{ item.quantity }}×</span>{{ item.name }}</li>
             {% endfor %}
         </ul>
-        {% if order.picked_up_at %}
-        <div class="ausgabe-card__meta">
-            Bezahlt: {{ order.picked_up_at.strftime("%H:%M") }} Uhr
-        </div>
-        {% endif %}
     </div>
     <button
-        class="ausgabe-card__action"
+        class="ausgabe-card-compact__action"
         hx-post="/orders/{{ order.order_id }}/handout"
         hx-target="#ausgabe-card-{{ order.order_id }}"
         hx-swap="outerHTML"

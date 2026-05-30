@@ -3,7 +3,7 @@
     <div class="mb-3" style="font-size:var(--text-sm); font-weight:var(--font-semibold); color:var(--color-text-tertiary); text-transform:uppercase; letter-spacing:0.5px;">
         {{ orders | length }} Bestellung{{ 'en' if orders | length != 1 else '' }} warten
     </div>
-    <div class="space-y-3">
+    <div class="ausgabe-grid">
         {% for order in orders %}
         {% include "partials/ausgabe_card.html" %}
         {% endfor %}
