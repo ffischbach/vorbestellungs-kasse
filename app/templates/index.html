@@ -61,6 +61,8 @@
             htmx.trigger(document.getElementById('stats'), 'pickup');
             const ov = document.getElementById('overview-content');
             if (ov) htmx.trigger(ov, 'pickup');
+            const card = document.querySelector(`[data-order-id="${d.order_id}"]`);
+            if (card) htmx.ajax('GET', `/orders/${d.order_id}/card`, {target: card, swap: 'outerHTML'});
         }
     };
 "></div>

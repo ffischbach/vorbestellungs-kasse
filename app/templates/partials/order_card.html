@@ -1,4 +1,4 @@
-<div class="order-card {% if order.picked_up %}order-card--done{% endif %}" data-order-card>
+<div class="order-card {% if order.picked_up %}order-card--done{% endif %}" data-order-card data-order-id="{{ order.order_id }}">
     <div class="order-card__body">
         <div class="order-card__head">
             <span class="order-card__name">{{ order.first_name }} {{ order.last_name }}</span>
