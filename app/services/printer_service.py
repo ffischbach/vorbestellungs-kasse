@@ -59,6 +59,5 @@ class PrinterService:
         ts = order.picked_up_at or datetime.now(UTC)
         p.text(f"Abgeholt: {ts.strftime('%d.%m.%Y  %H:%M')}\n")
         p.text(f"Bon-Nr.:  #{order.order_id}\n")
-        p.text("*** TESTZEILE ***\n")
 
         p.cut()
