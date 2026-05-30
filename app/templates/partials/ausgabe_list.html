@@ -1,0 +1,18 @@
+<div id="ausgabe-list" hx-get="/ausgabe/list" hx-trigger="refresh" hx-swap="outerHTML">
+    {% if orders %}
+    <div class="mb-3" style="font-size:var(--text-sm); font-weight:var(--font-semibold); color:var(--color-text-tertiary); text-transform:uppercase; letter-spacing:0.5px;">
+        {{ orders | length }} Bestellung{{ 'en' if orders | length != 1 else '' }} warten
+    </div>
+    <div class="space-y-3">
+        {% for order in orders %}
+        {% include "partials/ausgabe_card.html" %}
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="card" style="text-align:center; padding:var(--space-10) var(--space-5);">
+        <div style="font-size:var(--text-3xl); margin-bottom:var(--space-3);">✓</div>
+        <div style="font-size:var(--text-lg); font-weight:var(--font-semibold); color:var(--color-accent);">Alle Bestellungen ausgegeben</div>
+        <div style="font-size:var(--text-sm); color:var(--color-text-tertiary); margin-top:var(--space-2);">Keine offenen Einträge</div>
+    </div>
+    {% endif %}
+</div>

@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %}Ausgabe – Fischerfest{% endblock %}
+
+{% block content %}
+<div style="display:none;" x-data x-init="
+    const es = new EventSource('/events');
+    es.onmessage = e => {
+        const d = JSON.parse(e.data);
+        if (d.type === 'pickup' || d.type === 'handout') {
+            htmx.trigger(document.getElementById('ausgabe-list'), 'refresh');
+        }
+    };
+"></div>
+
+{% include "partials/ausgabe_list.html" %}
+{% endblock %}
