@@ -1,9 +1,9 @@
 # vorbestellungs-kasse
 
-Abholsystem für das jährliche Fischerfest der ASG Ettlingen. Kunden bestellen
-Fisch vorab online, holen ihn am Eventtag ab und zahlen bar. Die App läuft auf
-einem Raspberry Pi mit eigenem WLAN-Hotspot – kein Internet, kein IT-Personal
-vor Ort nötig.
+Offline-Abholsystem für Vorbestellungen an Vereins- oder Gemeinde-Events.
+Kunden bestellen vorab online, holen am Eventtag ab und zahlen bar. Die App
+läuft auf einem Raspberry Pi mit eigenem WLAN-Hotspot – kein Internet, kein
+IT-Personal vor Ort nötig.
 
 Mitarbeiter suchen Bestellungen per Tablet (Name, E-Mail oder Bestellnummer),
 bestätigen die Abholung, und der Bon kommt aus dem Drucker. Fertig.
@@ -57,6 +57,12 @@ uv run mypy app
 | `ABHOLZEIT_LABEL` | `Abholzeit` | Bezeichnung für das Zeitfenster-Feld |
 | `TOGO_LABEL` | `To-Go` | Badge-Text für To-Go-Bestellungen |
 
+**CSV-Format**
+
+| Variable | Default | Beschreibung |
+|---|---|---|
+| `CSV_FORMAT` | `pivoted` | `pivoted` = WooCommerce (item_1/quantity_1 …); `line_items` = eine Zeile pro Artikel (Shopify, Pretix …) |
+
 **CSV-Spaltennamen** (nur anpassen wenn kein WooCommerce-Export)
 
 | Variable | Default |
@@ -68,9 +74,11 @@ uv run mypy app
 | `CSV_COL_EMAIL` | `email` |
 | `CSV_COL_TIMESLOT` | `abholzeit` |
 | `CSV_COL_TOGO` | `togo` |
-| `CSV_COL_ITEM_PREFIX` | `item_` |
-| `CSV_COL_QUANTITY_PREFIX` | `quantity_` |
-| `CSV_ITEM_SLOTS` | `10` |
+| `CSV_COL_ITEM_PREFIX` | `item_` | Nur für `CSV_FORMAT=pivoted` |
+| `CSV_COL_QUANTITY_PREFIX` | `quantity_` | Nur für `CSV_FORMAT=pivoted` |
+| `CSV_ITEM_SLOTS` | `10` | Nur für `CSV_FORMAT=pivoted` |
+| `CSV_COL_ITEM_NAME` | `item_name` | Nur für `CSV_FORMAT=line_items` |
+| `CSV_COL_ITEM_QUANTITY` | `quantity` | Nur für `CSV_FORMAT=line_items` |
 
 **Infrastruktur** (Raspberry Pi, nur für `scripts/prepare.sh`)
 

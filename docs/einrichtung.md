@@ -25,7 +25,7 @@ Danach reicht jedes Jahr `git pull && bash scripts/prepare.sh` + Neustart.
 
    | Einstellung | Wert |
    |---|---|
-   | Hostname | `fischerfest` |
+   | Hostname | _(beliebig, z.&nbsp;B. `kasse`)_ |
    | SSH aktivieren | Ja (Passwort-Authentifizierung) |
    | Benutzername | `pi` |
    | Passwort | _(sicheres Passwort wählen und notieren)_ |
@@ -41,10 +41,10 @@ Danach reicht jedes Jahr `git pull && bash scripts/prepare.sh` + Neustart.
 Pi ca. 60 Sekunden booten lassen, dann:
 
 ```bash
-ssh pi@fischerfest.local
+ssh pi@kasse.local
 ```
 
-Falls `fischerfest.local` nicht auflöst (kommt vor bei manchen Routern):
+Falls `kasse.local` nicht auflöst (kommt vor bei manchen Routern):
 
 ```bash
 # IP-Adresse im Router-Interface nachschauen, dann:
@@ -80,11 +80,11 @@ bash scripts/prepare.sh
 
 Das Script erledigt automatisch:
 - Systempakete installieren (`python3-venv`, `git`, `libusb-1.0-0-dev`)
-- Hostname auf `fischerfest` setzen
+- Hostname auf den Wert aus `PI_HOSTNAME` setzen
 - Benutzer `pi` zur Drucker-Gruppe `lp` hinzufügen
 - Virtuelle Python-Umgebung anlegen und App-Abhängigkeiten installieren
 - `.env` aus Vorlage erstellen
-- WLAN-Hotspot einrichten (`Anglerverein` / `Fischerfest2025`)
+- WLAN-Hotspot einrichten (SSID und Passwort aus `HOTSPOT_SSID` / `HOTSPOT_PASSWORD`)
 - systemd-Service installieren und für Auto-Start aktivieren
 
 ---
@@ -119,7 +119,7 @@ Nach dem Neustart:
 Verbindung wiederherstellen:
 
 ```bash
-ssh pi@fischerfest.local
+ssh pi@kasse.local
 ```
 
 ---
@@ -137,8 +137,8 @@ nmcli connection show Hotspot
 sudo journalctl -u vorbestellungs-kasse -f
 ```
 
-Im Browser: `http://fischerfest.local:8000` – die Kassenoberfläche sollte
-erscheinen (noch ohne Bestellungen).
+Im Browser: `http://kasse.local:8000` (oder den konfigurierten `PI_HOSTNAME`) –
+die Kassenoberfläche sollte erscheinen (noch ohne Bestellungen).
 
 ---
 
