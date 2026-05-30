@@ -47,7 +47,7 @@
             total: {{ order.net_total | float }},
             get paid() { return parseFloat(this.amount.replace(',', '.')) || 0; },
             get change() { return Math.round((this.paid - this.total) * 100) / 100; },
-            get isValid() { return this.paid >= this.total - 0.005; },
+            get isValid() { return this.amount.trim() === '' || this.paid >= this.total - 0.005; },
             quickAmounts() {
                 const t = this.total;
                 function ceilTo(v, s) { return Math.ceil(v / s) * s; }
