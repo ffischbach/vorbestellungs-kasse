@@ -34,27 +34,30 @@ class PrinterService:
 
         p: File = printer  # type: ignore[assignment]
 
-        p.set(align="center", bold=True, font="b")
+        font = settings.printer_font.lower()
+        sep = "─" * (52 if font == "b" else 42)
+
+        p.set(align="center", bold=True, font=font)
         p.text(f"{settings.vereinsname}\n")
         p.text(f"{settings.event_name} {settings.event_jahr}\n")
-        p.set(align="center", bold=False, font="b")
-        p.text("─" * 42 + "\n")
+        p.set(align="center", bold=False, font=font)
+        p.text(sep + "\n")
 
-        p.set(align="left", font="b")
+        p.set(align="left", font=font)
         p.text(f"#{order.order_id} · {order.first_name} {order.last_name}\n")
 
         for item in order.items:
             p.text(f"  {item['quantity']}x  {item['name']}\n")
 
-        p.text("─" * 42 + "\n")
-        p.set(bold=True, font="b")
+        p.text(sep + "\n")
+        p.set(bold=True, font=font)
         p.text(f"Gesamt:    {order.net_total:.2f} EUR\n")
-        p.set(bold=False, font="b")
+        p.set(bold=False, font=font)
 
         if order.abholzeit:
             p.text(f"{settings.abholzeit_label}: {order.abholzeit}\n")
 
-        p.text("─" * 42 + "\n")
+        p.text(sep + "\n")
 
         ts = order.picked_up_at or datetime.now(UTC)
         p.text(f"Abgeholt: {ts.strftime('%d.%m.%Y  %H:%M')}\n")

@@ -13,6 +13,7 @@ class Settings(BaseSettings):
 
     printer_device: str = "/dev/usb/lp0"
     printer_enabled: bool = True
+    printer_font: str = "b"  # "a" = normal (42 Zeichen/Zeile), "b" = klein (52 Zeichen/Zeile)
 
     host: str = "0.0.0.0"
     port: int = 8000
