@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 
 from app.database import get_db
 from app.jinja import templates
+from app.repositories.order_repository import OrderRepository
 from app.services.csv_import_service import CsvImportService
 from app.services.printer_service import PrinterService
 
@@ -38,4 +39,15 @@ async def import_csv(
     except Exception as e:
         return templates.TemplateResponse(
             request, "partials/import_result.html", {"error": str(e)}, status_code=400
+        )
+
+
+@router.delete("/reset", response_class=HTMLResponse)
+async def reset_orders(request: Request, db: Session = Depends(get_db)) -> HTMLResponse:
+    try:
+        OrderRepository(db).delete_all()
+        return templates.TemplateResponse(request, "partials/reset_result.html", {})
+    except Exception as e:
+        return templates.TemplateResponse(
+            request, "partials/reset_result.html", {"error": str(e)}, status_code=500
         )

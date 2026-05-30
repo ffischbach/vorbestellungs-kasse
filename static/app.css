@@ -512,6 +512,18 @@ body {
 
 .btn-ghost:hover { background: rgba(0,0,0,0.05); }
 
+.btn-danger {
+  background: #FF3B30;
+  color: #fff;
+  padding: var(--space-2) var(--space-4);
+  min-height: 44px;
+  border-radius: var(--radius-sm);
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+}
+.btn-danger:hover  { background: #D63029; }
+.btn-danger:active { background: #B52820; }
+
 /* --- BADGES --- */
 .badge {
   display: inline-flex;

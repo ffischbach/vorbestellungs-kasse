@@ -1,0 +1,9 @@
+{% if error %}
+    <div class="alert alert-danger mt-3">
+        Reset fehlgeschlagen: {{ error }}
+    </div>
+{% else %}
+    <div class="alert alert-success mt-3">
+        Alle Bestellungen wurden gelöscht.
+    </div>
+{% endif %}

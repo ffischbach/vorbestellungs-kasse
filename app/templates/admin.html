@@ -35,10 +35,41 @@
     <div id="import-result"></div>
 </div>
 
-<div class="card">
+<div class="card mb-4">
     <p style="font-size:var(--text-xs);font-weight:var(--font-semibold);color:var(--color-text-tertiary);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:var(--space-4);">
         Aktueller Stand
     </p>
     <div hx-get="/orders/stats" hx-trigger="load, every 10s" hx-swap="innerHTML"></div>
+</div>
+
+<div class="card" x-data="{ confirm: false }">
+    <p style="font-size:var(--text-xs);font-weight:var(--font-semibold);color:var(--color-text-tertiary);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:var(--space-3);">
+        Daten zurücksetzen
+    </p>
+    <p class="text-muted mb-4" style="font-size:var(--text-sm);">
+        Alle Bestellungen unwiderruflich löschen – z.&thinsp;B. vor einem neuen Event oder nach dem Eventtag.
+    </p>
+
+    <div x-show="!confirm">
+        <button class="btn btn-danger" @click="confirm = true">Alle Bestellungen löschen</button>
+    </div>
+
+    <div x-show="confirm" x-cloak class="flex flex-col gap-3">
+        <p style="font-size:var(--text-sm);font-weight:var(--font-semibold);">
+            Wirklich alle Bestellungen löschen? Diese Aktion kann nicht rückgängig gemacht werden.
+        </p>
+        <div class="flex gap-3">
+            <button
+                class="btn btn-danger"
+                hx-delete="/admin/reset"
+                hx-target="#reset-result"
+                hx-swap="innerHTML"
+                @click="confirm = false"
+            >Ja, löschen</button>
+            <button class="btn btn-ghost" @click="confirm = false">Abbrechen</button>
+        </div>
+    </div>
+
+    <div id="reset-result"></div>
 </div>
 {% endblock %}
