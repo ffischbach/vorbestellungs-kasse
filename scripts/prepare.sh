@@ -88,10 +88,14 @@ fi
 
 # systemd-Service installieren und für Auto-Start aktivieren
 echo "[7/7] systemd-Service installieren..."
-sudo cp "$INSTALL_DIR/systemd/$SERVICE_NAME.service" /etc/systemd/system/
+# Pfad-Platzhalter im Service-Template durch tatsächliches Installationsverzeichnis ersetzen
+sudo sed "s|/home/pi/fischverkauf|$INSTALL_DIR|g" \
+    "$INSTALL_DIR/systemd/$SERVICE_NAME.service" \
+    | sudo tee /etc/systemd/system/$SERVICE_NAME.service > /dev/null
 sudo systemctl daemon-reload
 sudo systemctl enable "$SERVICE_NAME"
 echo "      Service aktiviert (startet beim nächsten Booten automatisch)."
+echo "      Installationsverzeichnis: $INSTALL_DIR"
 
 echo ""
 echo "=== Vorbereitung abgeschlossen ==="
