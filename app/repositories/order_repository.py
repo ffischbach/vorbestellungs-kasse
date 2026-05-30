@@ -27,6 +27,25 @@ class OrderRepository:
     def get_all(self) -> list[Order]:
         return self.db.query(Order).order_by(Order.last_name, Order.first_name).all()
 
+    def get_open_orders(self) -> list[Order]:
+        from sqlalchemy import case, nulls_last
+
+        return (
+            self.db.query(Order)
+            .filter(Order.picked_up.is_(False))
+            .order_by(nulls_last(Order.abholzeit), Order.last_name, Order.first_name)
+            .all()
+        )
+
+    def get_recent_pickups(self, limit: int = 15) -> list[Order]:
+        return (
+            self.db.query(Order)
+            .filter(Order.picked_up.is_(True))
+            .order_by(Order.picked_up_at.desc())
+            .limit(limit)
+            .all()
+        )
+
     def mark_picked_up(self, order: Order, picked_up_at: datetime) -> Order:
         order.picked_up = True
         order.picked_up_at = picked_up_at

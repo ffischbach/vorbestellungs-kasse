@@ -39,7 +39,29 @@ class OrderService:
     def get_overview(self) -> dict:
         return {
             "by_time": self.repo.count_by_abholzeit(),
+            "open_orders": self.repo.get_open_orders(),
+            "product_totals": self.get_product_totals(),
+            "recent_pickups": self.repo.get_recent_pickups(limit=20),
         }
+
+    def get_open_orders(self) -> list[Order]:
+        return self.repo.get_open_orders()
+
+    def get_product_totals(self) -> list[dict]:
+        totals: dict[str, int] = {}
+        for order in self.repo.get_open_orders():
+            for item in order.items:
+                name = item.get("name", "")
+                qty = int(item.get("quantity", 0))
+                if name:
+                    totals[name] = totals.get(name, 0) + qty
+        return sorted(
+            [{"name": k, "quantity": v} for k, v in totals.items()],
+            key=lambda x: -x["quantity"],
+        )
+
+    def get_recent_pickups(self, limit: int = 15) -> list[Order]:
+        return self.repo.get_recent_pickups(limit)
 
     def get_by_id(self, order_id: int) -> Order:
         order = self.repo.get_by_order_id(order_id)
