@@ -24,7 +24,7 @@ Ersteinrichtung: siehe [docs/einrichtung.md](docs/einrichtung.md)
 bash scripts/prepare.sh        # einmalig zuhause (braucht Internet)
 git pull && bash scripts/prepare.sh  # nach Updates
 
-bash scripts/event.sh          # am Eventtag vor Ort (offline)
+bash scripts/status.sh         # optional: Systemstatus + URL anzeigen
 
 # CSV aus WooCommerce importieren
 curl -X POST http://localhost:8000/admin/import -F "file=@bestellungen.csv"

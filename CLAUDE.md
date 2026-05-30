@@ -295,7 +295,7 @@ fischverkauf/
 ├── data/                       # SQLite DB + CSV – nicht ins Repo!
 ├── systemd/fischverkauf.service
 ├── scripts/prepare.sh          # Einmaliges Setup mit Internet (zuhause)
-├── scripts/event.sh            # Start am Eventtag (offline)
+├── scripts/status.sh           # Optionaler Statuscheck am Eventtag
 ├── pyproject.toml              # Dependencies + Tool-Konfiguration
 └── .env.example
 ```
@@ -403,8 +403,9 @@ bash scripts/prepare.sh
 git pull
 bash scripts/prepare.sh
 
-# Am Eventtag vor Ort (offline)
-bash scripts/event.sh
+# Am Eventtag: Pi starten – alles läuft automatisch
+# Optional: Systemstatus und URL anzeigen
+bash scripts/status.sh
 
 # Logs prüfen
 sudo journalctl -u fischverkauf -f
