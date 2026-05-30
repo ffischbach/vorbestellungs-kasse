@@ -15,6 +15,14 @@ class OrderAlreadyPickedUpError(Exception):
     pass
 
 
+class OrderNotPickedUpError(Exception):
+    pass
+
+
+class OrderAlreadyHandedOutError(Exception):
+    pass
+
+
 class OrderService:
     def __init__(self, db: Session) -> None:
         self.repo = OrderRepository(db)
@@ -100,3 +108,17 @@ class OrderService:
             printer_error = str(e)
 
         return order, printer_error
+
+    def hand_out(self, order_id: int) -> Order:
+        """Marks order as handed out. Returns updated order."""
+        order = self.repo.get_by_order_id(order_id)
+        if not order:
+            raise OrderNotFoundError(f"Bestellung #{order_id} nicht gefunden")
+        if not order.picked_up:
+            raise OrderNotPickedUpError(f"Bestellung #{order_id} wurde noch nicht bezahlt")
+        if order.handed_out:
+            raise OrderAlreadyHandedOutError(f"Bestellung #{order_id} wurde bereits ausgegeben")
+        return self.repo.mark_handed_out(order)
+
+    def get_waiting_handout(self) -> list[Order]:
+        return self.repo.get_waiting_handout()

@@ -2,7 +2,13 @@ import pytest
 from sqlalchemy.orm import Session
 
 from app.models.order import Order
-from app.services.order_service import OrderAlreadyPickedUpError, OrderNotFoundError, OrderService
+from app.services.order_service import (
+    OrderAlreadyHandedOutError,
+    OrderAlreadyPickedUpError,
+    OrderNotFoundError,
+    OrderNotPickedUpError,
+    OrderService,
+)
 
 
 def make_order(db: Session, **kwargs: object) -> Order:
@@ -89,3 +95,38 @@ def test_get_stats(db: Session) -> None:
     assert stats["total"] == 2
     assert stats["picked_up"] == 1
     assert stats["open"] == 1
+    assert stats["handed_out"] == 0
+    assert stats["waiting_handout"] == 1
+
+
+def test_handout_success(db: Session) -> None:
+    make_order(db, picked_up=True)
+    order = OrderService(db).hand_out(1001)
+    assert order.handed_out is True
+    assert order.handed_out_at is not None
+
+
+def test_handout_not_picked_up_raises(db: Session) -> None:
+    make_order(db)
+    with pytest.raises(OrderNotPickedUpError):
+        OrderService(db).hand_out(1001)
+
+
+def test_handout_already_handed_out_raises(db: Session) -> None:
+    make_order(db, picked_up=True, handed_out=True)
+    with pytest.raises(OrderAlreadyHandedOutError):
+        OrderService(db).hand_out(1001)
+
+
+def test_handout_unknown_order_raises(db: Session) -> None:
+    with pytest.raises(OrderNotFoundError):
+        OrderService(db).hand_out(9999)
+
+
+def test_get_waiting_handout(db: Session) -> None:
+    make_order(db, order_id=1, picked_up=True, handed_out=False)
+    make_order(db, order_id=2, picked_up=True, handed_out=True)
+    make_order(db, order_id=3, picked_up=False)
+    waiting = OrderService(db).get_waiting_handout()
+    assert len(waiting) == 1
+    assert waiting[0].order_id == 1
