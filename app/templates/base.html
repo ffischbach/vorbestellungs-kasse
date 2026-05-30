@@ -18,6 +18,15 @@
           flash._timer = setTimeout(function() { flash.innerHTML = ''; }, 5000);
         }
       });
+
+      function localizeTimestamps(root) {
+        (root || document).querySelectorAll('time[data-utc]').forEach(function(el) {
+          var d = new Date(el.dataset.utc);
+          el.textContent = d.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
+        });
+      }
+      document.addEventListener('DOMContentLoaded', function() { localizeTimestamps(); });
+      document.addEventListener('htmx:afterSwap', function(e) { localizeTimestamps(e.detail.elt); });
     </script>
 </head>
 <body class="min-h-screen">
