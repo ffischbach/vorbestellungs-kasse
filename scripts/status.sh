@@ -35,8 +35,9 @@ else
     echo "  Drucker:       nicht gefunden – Kabel prüfen, dann Seite neu laden"
 fi
 
-# URL
-IP=$(hostname -I 2>/dev/null | awk '{print $1}')
+# URL – Hotspot-IP bevorzugen, Fallback auf primäre Netzwerkadresse
+HOTSPOT_IP=$(nmcli -g IP4.ADDRESS connection show --active Hotspot 2>/dev/null | cut -d'/' -f1 || true)
+IP="${HOTSPOT_IP:-$(hostname -I 2>/dev/null | awk '{print $1}')}"
 echo ""
 echo "  Kassenoberfläche: http://${IP}:${PORT}"
 echo ""
