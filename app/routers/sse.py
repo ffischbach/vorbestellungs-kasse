@@ -33,8 +33,11 @@ async def _event_stream(
 ) -> AsyncGenerator[str, None]:
     try:
         while True:
-            event = await queue.get()
-            yield f"data: {json.dumps(event)}\n\n"
+            try:
+                event = await asyncio.wait_for(queue.get(), timeout=25.0)
+                yield f"data: {json.dumps(event)}\n\n"
+            except asyncio.TimeoutError:
+                yield ":\n\n"
     except asyncio.CancelledError:
         pass
 
