@@ -1,9 +1,9 @@
 from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import HTMLResponse
-from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
 
 from app.database import get_db
+from app.jinja import templates
 from app.routers.sse import broadcaster
 from app.services.order_service import (
     OrderAlreadyPickedUpError,
@@ -12,7 +12,6 @@ from app.services.order_service import (
 )
 
 router = APIRouter()
-templates = Jinja2Templates(directory="app/templates")
 
 
 @router.get("/", response_class=HTMLResponse)
