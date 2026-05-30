@@ -2,7 +2,7 @@
     <div class="tab-bar tab-bar--sm mb-4">
         <button class="tab-btn" :class="{'tab-btn--active': $store.overview.subtab==='zeitfenster'}" @click="$store.overview.subtab='zeitfenster'">Zeitfenster</button>
         <button class="tab-btn" :class="{'tab-btn--active': $store.overview.subtab==='offen'}" @click="$store.overview.subtab='offen'">Offen ({{ open_orders|length }})</button>
-        <button class="tab-btn" :class="{'tab-btn--active': $store.overview.subtab==='produkte'}" @click="$store.overview.subtab='produkte'">Produkte</button>
+        <button class="tab-btn" :class="{'tab-btn--active': $store.overview.subtab==='produkte'}" @click="$store.overview.subtab='produkte'">Offene Produkte</button>
         <button class="tab-btn" :class="{'tab-btn--active': $store.overview.subtab==='zuletzt'}" @click="$store.overview.subtab='zuletzt'">Zuletzt</button>
     </div>
 
