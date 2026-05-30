@@ -294,7 +294,8 @@ fischverkauf/
 │   └── test_csv_import.py
 ├── data/                       # SQLite DB + CSV – nicht ins Repo!
 ├── systemd/fischverkauf.service
-├── scripts/setup.sh            # Einmaliges Setup auf dem Pi
+├── scripts/prepare.sh          # Einmaliges Setup mit Internet (zuhause)
+├── scripts/event.sh            # Start am Eventtag (offline)
 ├── pyproject.toml              # Dependencies + Tool-Konfiguration
 └── .env.example
 ```
@@ -395,12 +396,15 @@ Das Setup verwendet `python3 -m venv` + `pip` – kein uv, kein curl, keine
 externen Installer. Python 3.11+ ist auf Pi OS vorinstalliert.
 
 ```bash
-# Einmaliges Setup (nach git clone)
-bash scripts/setup.sh
+# Einmaliges Setup zuhause (braucht Internet)
+bash scripts/prepare.sh
 
-# Nach Updates
+# Nach Updates (braucht Internet)
 git pull
-sudo systemctl restart fischverkauf
+bash scripts/prepare.sh
+
+# Am Eventtag vor Ort (offline)
+bash scripts/event.sh
 
 # Logs prüfen
 sudo journalctl -u fischverkauf -f

@@ -18,9 +18,13 @@ uv run uvicorn app.main:app --reload
 
 ## Deployment (Raspberry Pi)
 
+Ersteinrichtung: siehe [docs/einrichtung.md](docs/einrichtung.md)
+
 ```bash
-bash scripts/setup.sh          # einmalig nach git clone
-git pull && sudo systemctl restart fischverkauf
+bash scripts/prepare.sh        # einmalig zuhause (braucht Internet)
+git pull && bash scripts/prepare.sh  # nach Updates
+
+bash scripts/event.sh          # am Eventtag vor Ort (offline)
 
 # CSV aus WooCommerce importieren
 curl -X POST http://localhost:8000/admin/import -F "file=@bestellungen.csv"
