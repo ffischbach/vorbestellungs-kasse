@@ -1,13 +1,13 @@
 [Unit]
-Description=Fischerfest Kassensystem
+Description=Vorbestellungs-Kasse
 After=NetworkManager.service
 Wants=NetworkManager.service
 
 [Service]
 Type=simple
 User=pi
-WorkingDirectory=/home/pi/fischverkauf
-ExecStart=/home/pi/fischverkauf/.venv/bin/uvicorn app.main:app --host 0.0.0.0 --port 8000
+WorkingDirectory=/home/pi/vorbestellungs-kasse
+ExecStart=/home/pi/vorbestellungs-kasse/.venv/bin/uvicorn app.main:app --host 0.0.0.0 --port 8000
 Restart=on-failure
 RestartSec=5
 # Maximal 5 Neustarts in 60 Sekunden – verhindert Restart-Sturm bei dauerhaftem Fehler

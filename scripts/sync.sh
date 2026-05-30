@@ -4,7 +4,7 @@
 set -euo pipefail
 
 REMOTE="${1:-fischerfest}"
-REMOTE_DIR="~/asg-ettlingen-cashier"
+REMOTE_DIR="~/vorbestellungs-kasse"
 
 echo "→ Sync nach $REMOTE:$REMOTE_DIR ..."
 
@@ -19,6 +19,6 @@ rsync -az --delete \
     "$REMOTE:$REMOTE_DIR"
 
 echo "→ Service neu starten..."
-ssh "$REMOTE" 'sudo systemctl restart fischverkauf && sleep 1 && systemctl is-active fischverkauf'
+ssh "$REMOTE" 'sudo systemctl restart vorbestellungs-kasse && sleep 1 && systemctl is-active vorbestellungs-kasse'
 
 echo "OK"

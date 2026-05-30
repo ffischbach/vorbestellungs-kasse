@@ -5,11 +5,11 @@
 set -euo pipefail
 
 INSTALL_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-SERVICE_NAME="fischverkauf"
+SERVICE_NAME="vorbestellungs-kasse"
 VENV_DIR="$INSTALL_DIR/.venv"
 PORT=8000
 
-echo "=== Fischerfest Kassensystem – Eventstart ==="
+echo "=== Vorbestellungs-Kasse – Eventstart ==="
 echo ""
 
 cd "$INSTALL_DIR"

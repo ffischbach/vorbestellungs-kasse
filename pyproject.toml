@@ -1,5 +1,5 @@
 [project]
-name = "fischverkauf"
+name = "vorbestellungs-kasse"
 version = "0.1.0"
 description = "Fischerfest – Digitales Bestellabholsystem"
 requires-python = ">=3.11"

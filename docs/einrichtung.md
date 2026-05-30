@@ -66,8 +66,8 @@ Dauert beim ersten Mal 5–15 Minuten. Nur einmalig nötig.
 ## Schritt 4 – Repository klonen
 
 ```bash
-git clone https://github.com/ASG-Ettlingen/fischverkauf.git ~/fischverkauf
-cd ~/fischverkauf
+git clone https://github.com/ASG-Ettlingen/fischverkauf.git ~/vorbestellungs-kasse
+cd ~/vorbestellungs-kasse
 ```
 
 ---
@@ -92,7 +92,7 @@ Das Script erledigt automatisch:
 ## Schritt 6 – Konfiguration anpassen
 
 ```bash
-nano ~/fischverkauf/.env
+nano ~/vorbestellungs-kasse/.env
 ```
 
 Mindestens prüfen:
@@ -128,13 +128,13 @@ ssh pi@fischerfest.local
 
 ```bash
 # Service läuft?
-systemctl status fischverkauf
+systemctl status vorbestellungs-kasse
 
 # Hotspot aktiv?
 nmcli connection show Hotspot
 
 # Logs (live)
-sudo journalctl -u fischverkauf -f
+sudo journalctl -u vorbestellungs-kasse -f
 ```
 
 Im Browser: `http://fischerfest.local:8000` – die Kassenoberfläche sollte
@@ -145,7 +145,7 @@ erscheinen (noch ohne Bestellungen).
 ## Jährliche Aktualisierung
 
 ```bash
-cd ~/fischverkauf
+cd ~/vorbestellungs-kasse
 git pull
 bash scripts/prepare.sh
 sudo reboot
@@ -159,7 +159,7 @@ Bestellungen aus WooCommerce exportieren und auf den Pi übertragen:
 
 ```bash
 # Von deinem Laptop aus:
-scp bestellungen.csv pi@fischerfest.local:~/fischverkauf/data/
+scp bestellungen.csv pi@fischerfest.local:~/vorbestellungs-kasse/data/
 
 # Auf dem Pi importieren:
 curl -X POST http://localhost:8000/admin/import \
