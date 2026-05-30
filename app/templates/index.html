@@ -10,7 +10,7 @@ document.addEventListener('alpine:init', () => {
     <div
         id="stats"
         hx-get="/orders/stats"
-        hx-trigger="load, every 15s, pickup"
+        hx-trigger="load, every 15s"
         hx-swap="innerHTML"
     ></div>
 </div>
@@ -63,7 +63,7 @@ document.addEventListener('alpine:init', () => {
         <div
             id="overview-content"
             hx-get="/orders/overview"
-            hx-trigger="load, pickup, refresh"
+            hx-trigger="load, refresh"
             hx-swap="innerHTML"
         ></div>
     </div>
@@ -74,9 +74,8 @@ document.addEventListener('alpine:init', () => {
     es.onmessage = e => {
         const d = JSON.parse(e.data);
         if (d.type === 'pickup') {
-            htmx.trigger(document.getElementById('stats'), 'pickup');
-            const ov = document.getElementById('overview-content');
-            if (ov) htmx.trigger(ov, 'pickup');
+            htmx.ajax('GET', '/orders/stats', {target: document.getElementById('stats'), swap: 'innerHTML'});
+            htmx.ajax('GET', '/orders/overview', {target: document.getElementById('overview-content'), swap: 'innerHTML'});
             const card = document.querySelector(`[data-order-id="${d.order_id}"]`);
             if (card) htmx.ajax('GET', `/orders/${d.order_id}/card`, {target: card, swap: 'outerHTML'});
         }
