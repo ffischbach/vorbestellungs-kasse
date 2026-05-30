@@ -11,6 +11,8 @@ class Settings(BaseSettings):
 
     database_url: str = "sqlite:///./data/vorbestellungs-kasse.db"
 
+    admin_password: str = "admin"
+
     printer_device: str = "/dev/usb/lp0"
     printer_enabled: bool = True
     printer_font: str = "b"  # "a" = normal (42 Zeichen/Zeile), "b" = klein (52 Zeichen/Zeile)
