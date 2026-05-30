@@ -36,7 +36,7 @@ class PrinterService:
 
         p.set(align="center", bold=True, double_height=True)
         p.text(f"{settings.vereinsname}\n")
-        p.text(f"Fischerfest {settings.event_jahr}\n")
+        p.text(f"{settings.event_name} {settings.event_jahr}\n")
         p.set(align="center", bold=False, double_height=False)
         p.text("─" * 32 + "\n")
 
@@ -53,7 +53,7 @@ class PrinterService:
         p.set(bold=False)
 
         if order.abholzeit:
-            p.text(f"Abholzeit: {order.abholzeit}\n")
+            p.text(f"{settings.abholzeit_label}: {order.abholzeit}\n")
 
         p.text("─" * 32 + "\n")
 

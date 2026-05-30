@@ -3,10 +3,10 @@ import io
 
 from sqlalchemy.orm import Session
 
+from app.config import settings
 from app.models.order import Order
 from app.repositories.order_repository import OrderRepository
 
-ITEM_SLOTS = 10
 _NULL_VALUES = {"NULL", "null", "None", ""}
 
 
@@ -36,9 +36,9 @@ class CsvImportService:
         orders = []
         for row in reader:
             items = []
-            for i in range(1, ITEM_SLOTS + 1):
-                name = _val(row.get(f"item_{i}"))
-                qty_raw = _val(row.get(f"quantity_{i}"))
+            for i in range(1, settings.csv_item_slots + 1):
+                name = _val(row.get(f"{settings.csv_col_item_prefix}{i}"))
+                qty_raw = _val(row.get(f"{settings.csv_col_quantity_prefix}{i}"))
                 if name and qty_raw:
                     try:
                         items.append({"name": name, "quantity": int(qty_raw)})
@@ -51,14 +51,14 @@ class CsvImportService:
 
             orders.append(
                 Order(
-                    order_id=int(row["order_id"]),
-                    net_total=float(row["net_total"]),
-                    first_name=row["first_name"].strip(),
-                    last_name=row["last_name"].strip(),
-                    email=row["email"].strip().lower(),
+                    order_id=int(row[settings.csv_col_order_id]),
+                    net_total=float(row[settings.csv_col_total]),
+                    first_name=row[settings.csv_col_first_name].strip(),
+                    last_name=row[settings.csv_col_last_name].strip(),
+                    email=row[settings.csv_col_email].strip().lower(),
                     customer_id=int(customer_id_raw) if customer_id_raw else None,
-                    abholzeit=_val(row.get("abholzeit")),
-                    togo=_val(row.get("togo")),
+                    abholzeit=_val(row.get(settings.csv_col_timeslot)),
+                    togo=_val(row.get(settings.csv_col_togo)),
                     num_items_sold=int(num_items_raw) if num_items_raw else None,
                     returning_customer=returning_raw in ("1", "true", "True")
                     if returning_raw is not None
