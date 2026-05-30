@@ -41,6 +41,12 @@ class OrderService:
             "by_time": self.repo.count_by_abholzeit(),
         }
 
+    def get_by_id(self, order_id: int) -> Order:
+        order = self.repo.get_by_order_id(order_id)
+        if not order:
+            raise OrderNotFoundError(f"Bestellung #{order_id} nicht gefunden")
+        return order
+
     def reprint(self, order_id: int) -> tuple[Order, str | None]:
         """Reprints the receipt for a picked-up order. Returns (order, printer_error)."""
         order = self.repo.get_by_order_id(order_id)

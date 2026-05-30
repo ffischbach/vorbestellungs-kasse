@@ -43,6 +43,16 @@ async def overview(request: Request, db: Session = Depends(get_db)) -> HTMLRespo
     return templates.TemplateResponse(request, "partials/overview.html", data)
 
 
+@router.get("/orders/{order_id}/card", response_class=HTMLResponse)
+async def order_card(request: Request, order_id: int, db: Session = Depends(get_db)) -> HTMLResponse:
+    service = OrderService(db)
+    try:
+        order = service.get_by_id(order_id)
+        return templates.TemplateResponse(request, "partials/order_card.html", {"order": order})
+    except OrderNotFoundError as e:
+        raise HTTPException(status_code=404, detail=str(e)) from e
+
+
 @router.post("/orders/{order_id}/pickup", response_class=HTMLResponse)
 async def pickup(request: Request, order_id: int, db: Session = Depends(get_db)) -> HTMLResponse:
     service = OrderService(db)
