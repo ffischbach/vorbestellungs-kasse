@@ -36,7 +36,7 @@ async def _event_stream(
             try:
                 event = await asyncio.wait_for(queue.get(), timeout=25.0)
                 yield f"data: {json.dumps(event)}\n\n"
-            except asyncio.TimeoutError:
+            except TimeoutError:
                 yield ":\n\n"
     except asyncio.CancelledError:
         pass
