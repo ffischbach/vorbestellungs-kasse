@@ -28,7 +28,7 @@ class OrderRepository:
         return self.db.query(Order).order_by(Order.last_name, Order.first_name).all()
 
     def get_open_orders(self) -> list[Order]:
-        from sqlalchemy import case, nulls_last
+        from sqlalchemy import nulls_last
 
         return (
             self.db.query(Order)
