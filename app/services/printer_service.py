@@ -34,28 +34,27 @@ class PrinterService:
 
         p: File = printer  # type: ignore[assignment]
 
-        p.set(align="center", bold=True, double_height=True)
+        p.set(align="center", bold=True, font="b")
         p.text(f"{settings.vereinsname}\n")
         p.text(f"{settings.event_name} {settings.event_jahr}\n")
-        p.set(align="center", bold=False, double_height=False)
-        p.text("─" * 32 + "\n")
+        p.set(align="center", bold=False, font="b")
+        p.text("─" * 42 + "\n")
 
-        p.set(align="left")
-        p.text(f"Bestellung #{order.order_id}\n")
-        p.text(f"{order.first_name} {order.last_name}\n\n")
+        p.set(align="left", font="b")
+        p.text(f"#{order.order_id} · {order.first_name} {order.last_name}\n")
 
         for item in order.items:
             p.text(f"  {item['quantity']}x  {item['name']}\n")
 
-        p.text("\n" + "─" * 32 + "\n")
-        p.set(bold=True)
+        p.text("─" * 42 + "\n")
+        p.set(bold=True, font="b")
         p.text(f"Gesamt:    {order.net_total:.2f} EUR\n")
-        p.set(bold=False)
+        p.set(bold=False, font="b")
 
         if order.abholzeit:
             p.text(f"{settings.abholzeit_label}: {order.abholzeit}\n")
 
-        p.text("─" * 32 + "\n")
+        p.text("─" * 42 + "\n")
 
         ts = order.picked_up_at or datetime.now(UTC)
         p.text(f"Abgeholt: {ts.strftime('%d.%m.%Y  %H:%M')}\n")
