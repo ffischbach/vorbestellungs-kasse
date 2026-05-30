@@ -21,6 +21,8 @@ class OrderRead(BaseModel):
     items: list[OrderItem]
     picked_up: bool
     picked_up_at: datetime | None
+    handed_out: bool
+    handed_out_at: datetime | None
 
     model_config = {"from_attributes": True}
 
@@ -34,3 +36,5 @@ class Stats(BaseModel):
     total: int
     picked_up: int
     open: int
+    handed_out: int
+    waiting_handout: int

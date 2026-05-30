@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import UTC, datetime
 
 from sqlalchemy import ColumnElement, or_
 from sqlalchemy.orm import Session
@@ -46,9 +46,24 @@ class OrderRepository:
             .all()
         )
 
+    def get_waiting_handout(self) -> list[Order]:
+        return (
+            self.db.query(Order)
+            .filter(Order.picked_up.is_(True), Order.handed_out.is_(False))
+            .order_by(Order.picked_up_at.asc())
+            .all()
+        )
+
     def mark_picked_up(self, order: Order, picked_up_at: datetime) -> Order:
         order.picked_up = True
         order.picked_up_at = picked_up_at
+        self.db.commit()
+        self.db.refresh(order)
+        return order
+
+    def mark_handed_out(self, order: Order) -> Order:
+        order.handed_out = True
+        order.handed_out_at = datetime.now(UTC)
         self.db.commit()
         self.db.refresh(order)
         return order
@@ -65,7 +80,14 @@ class OrderRepository:
     def count(self) -> dict[str, int]:
         total = self.db.query(Order).count()
         picked_up = self.db.query(Order).filter(Order.picked_up.is_(True)).count()
-        return {"total": total, "picked_up": picked_up, "open": total - picked_up}
+        handed_out = self.db.query(Order).filter(Order.handed_out.is_(True)).count()
+        return {
+            "total": total,
+            "picked_up": picked_up,
+            "open": total - picked_up,
+            "handed_out": handed_out,
+            "waiting_handout": picked_up - handed_out,
+        }
 
     def count_by_abholzeit(self) -> list[dict]:
         from sqlalchemy import func

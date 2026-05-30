@@ -27,3 +27,7 @@ class Order(Base):
 
     picked_up: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
     picked_up_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    handed_out: Mapped[bool] = mapped_column(
+        Boolean, default=False, nullable=False, server_default="0"
+    )
+    handed_out_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
