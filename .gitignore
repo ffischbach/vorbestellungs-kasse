@@ -20,6 +20,8 @@ data/*.db
 data/*.db-shm
 data/*.db-wal
 data/*.csv
+!data/example.csv
+!data/example_line_items.csv
 data/*.sqlite
 
 # IDE

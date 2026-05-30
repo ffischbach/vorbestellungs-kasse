@@ -1,0 +1,11 @@
+order_id,net_total,first_name,last_name,email,customer_id,abholzeit,togo,num_items_sold,returning_customer,date_paid,item_1,quantity_1,item_2,quantity_2,item_3,quantity_3,item_4,quantity_4,item_5,quantity_5,item_6,quantity_6,item_7,quantity_7,item_8,quantity_8,item_9,quantity_9,item_10,quantity_10
+1001,28.50,Max,Mustermann,max.mustermann@example.com,101,10:00 – 11:00,,3,0,2026-05-30 09:15:00,Forelle (küchenfertig),2,Karpfen (ganz),1,,,,,,,,,,,,,,,
+1002,42.00,Erika,Musterfrau,erika.musterfrau@example.com,102,11:00 – 12:00,ja,4,1,2026-05-30 09:22:00,Hecht (filetiert),3,Forelle (küchenfertig),1,,,,,,,,,,,,,,,
+1003,15.00,Hans,Schmidt,hans.schmidt@example.com,103,10:00 – 11:00,,2,0,2026-05-30 08:55:00,Karpfen (ganz),2,,,,,,,,,,,,,,,,,
+1004,63.50,Maria,Huber,maria.huber@example.com,104,12:00 – 13:00,,5,1,2026-05-30 09:40:00,Forelle (küchenfertig),3,Hecht (filetiert),2,,,,,,,,,,,,,,,
+1005,21.00,Peter,Weber,peter.weber@example.com,105,11:00 – 12:00,ja,2,0,2026-05-30 10:01:00,Karpfen (ganz),1,Forelle (küchenfertig),1,,,,,,,,,,,,,,,
+1006,35.00,Anna,Fischer,anna.fischer@example.com,106,13:00 – 14:00,,3,1,2026-05-30 10:15:00,Hecht (filetiert),2,Karpfen (ganz),1,,,,,,,,,,,,,,,
+1007,49.00,Thomas,Müller,thomas.mueller@example.com,107,10:00 – 11:00,,4,0,2026-05-30 09:05:00,Forelle (küchenfertig),4,,,,,,,,,,,,,,,,,
+1008,18.50,Sabine,Bauer,sabine.bauer@example.com,108,12:00 – 13:00,ja,2,1,2026-05-30 09:50:00,Karpfen (ganz),1,Hecht (filetiert),1,,,,,,,,,,,,,,,
+1009,56.00,Klaus,Wagner,klaus.wagner@example.com,109,11:00 – 12:00,,5,0,2026-05-30 10:30:00,Forelle (küchenfertig),2,Karpfen (ganz),2,Hecht (filetiert),1,,,,,,,,,,,
+1010,77.50,Ursula,Braun,ursula.braun@example.com,110,13:00 – 14:00,,7,1,2026-05-30 10:45:00,Forelle (küchenfertig),4,Karpfen (ganz),2,Hecht (filetiert),1,,,,,,,,,,,

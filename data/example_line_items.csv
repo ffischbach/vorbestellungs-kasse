@@ -1,0 +1,21 @@
+order_id,net_total,first_name,last_name,email,customer_id,abholzeit,togo,item_name,quantity
+1001,28.50,Max,Mustermann,max.mustermann@example.com,101,10:00 – 11:00,,Forelle (küchenfertig),2
+1001,28.50,Max,Mustermann,max.mustermann@example.com,101,10:00 – 11:00,,Karpfen (ganz),1
+1002,42.00,Erika,Musterfrau,erika.musterfrau@example.com,102,11:00 – 12:00,ja,Hecht (filetiert),3
+1002,42.00,Erika,Musterfrau,erika.musterfrau@example.com,102,11:00 – 12:00,ja,Forelle (küchenfertig),1
+1003,15.00,Hans,Schmidt,hans.schmidt@example.com,103,10:00 – 11:00,,Karpfen (ganz),2
+1004,63.50,Maria,Huber,maria.huber@example.com,104,12:00 – 13:00,,Forelle (küchenfertig),3
+1004,63.50,Maria,Huber,maria.huber@example.com,104,12:00 – 13:00,,Hecht (filetiert),2
+1005,21.00,Peter,Weber,peter.weber@example.com,105,11:00 – 12:00,ja,Karpfen (ganz),1
+1005,21.00,Peter,Weber,peter.weber@example.com,105,11:00 – 12:00,ja,Forelle (küchenfertig),1
+1006,35.00,Anna,Fischer,anna.fischer@example.com,106,13:00 – 14:00,,Hecht (filetiert),2
+1006,35.00,Anna,Fischer,anna.fischer@example.com,106,13:00 – 14:00,,Karpfen (ganz),1
+1007,49.00,Thomas,Müller,thomas.mueller@example.com,107,10:00 – 11:00,,Forelle (küchenfertig),4
+1008,18.50,Sabine,Bauer,sabine.bauer@example.com,108,12:00 – 13:00,Tisch 7,Karpfen (ganz),1
+1008,18.50,Sabine,Bauer,sabine.bauer@example.com,108,12:00 – 13:00,Tisch 7,Hecht (filetiert),1
+1009,56.00,Klaus,Wagner,klaus.wagner@example.com,109,11:00 – 12:00,,Forelle (küchenfertig),2
+1009,56.00,Klaus,Wagner,klaus.wagner@example.com,109,11:00 – 12:00,,Karpfen (ganz),2
+1009,56.00,Klaus,Wagner,klaus.wagner@example.com,109,11:00 – 12:00,,Hecht (filetiert),1
+1010,77.50,Ursula,Braun,ursula.braun@example.com,110,13:00 – 14:00,,Forelle (küchenfertig),4
+1010,77.50,Ursula,Braun,ursula.braun@example.com,110,13:00 – 14:00,,Karpfen (ganz),2
+1010,77.50,Ursula,Braun,ursula.braun@example.com,110,13:00 – 14:00,,Hecht (filetiert),1
