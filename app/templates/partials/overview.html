@@ -1,29 +1,114 @@
-{% if by_time %}
-<div class="slot-list">
-    {% for slot in by_time %}
-    <div class="slot-row">
-        <div class="slot-row__head">
-            <span class="slot-row__time">{{ slot.abholzeit }}</span>
-            {% if slot.open == 0 %}
-                <span class="slot-row__open slot-row__open--done">Alle abgeholt</span>
-            {% else %}
-                <span class="slot-row__open">{{ slot.open }} offen</span>
-            {% endif %}
-        </div>
-        <div class="slot-row__bar">
-            <div class="slot-row__fill"
-                 style="width:{{ (slot.picked_up / slot.total * 100)|round|int if slot.total > 0 else 0 }}%">
-            </div>
-        </div>
-        <div class="slot-row__meta">
-            <span>{{ slot.picked_up }} abgeholt</span>
-            <span>{{ slot.total }} gesamt</span>
-        </div>
+<div x-data="{ subtab: 'zeitfenster' }">
+    <div class="tab-bar tab-bar--sm mb-4">
+        <button class="tab-btn" :class="{'tab-btn--active': subtab==='zeitfenster'}" @click="subtab='zeitfenster'">Zeitfenster</button>
+        <button class="tab-btn" :class="{'tab-btn--active': subtab==='offen'}" @click="subtab='offen'">Offen ({{ open_orders|length }})</button>
+        <button class="tab-btn" :class="{'tab-btn--active': subtab==='produkte'}" @click="subtab='produkte'">Produkte</button>
+        <button class="tab-btn" :class="{'tab-btn--active': subtab==='zuletzt'}" @click="subtab='zuletzt'">Zuletzt</button>
     </div>
-    {% endfor %}
+
+    <!-- Zeitfenster -->
+    <div x-show="subtab === 'zeitfenster'">
+        {% if by_time %}
+        <div class="slot-list">
+            {% for slot in by_time %}
+            <div class="slot-row">
+                <div class="slot-row__head">
+                    <span class="slot-row__time">{{ slot.abholzeit }}</span>
+                    {% if slot.open == 0 %}
+                        <span class="slot-row__open slot-row__open--done">Alle abgeholt</span>
+                    {% else %}
+                        <span class="slot-row__open">{{ slot.open }} offen</span>
+                    {% endif %}
+                </div>
+                <div class="slot-row__bar">
+                    <div class="slot-row__fill"
+                         style="width:{{ (slot.picked_up / slot.total * 100)|round|int if slot.total > 0 else 0 }}%">
+                    </div>
+                </div>
+                <div class="slot-row__meta">
+                    <span>{{ slot.picked_up }} abgeholt</span>
+                    <span>{{ slot.total }} gesamt</span>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="text-center py-10 text-tertiary" style="font-size:var(--text-lg);">
+            Noch keine Bestellungen importiert.
+        </p>
+        {% endif %}
+    </div>
+
+    <!-- Offene Bestellungen -->
+    <div x-show="subtab === 'offen'" x-cloak>
+        {% if open_orders %}
+        <div class="open-order-list">
+            {% for order in open_orders %}
+            <div class="open-order-row"
+                 @click="$dispatch('switch-to-order', { orderId: '{{ order.order_id }}' })"
+                 role="button" tabindex="0"
+                 @keydown.enter="$dispatch('switch-to-order', { orderId: '{{ order.order_id }}' })">
+                <div class="open-order-row__head">
+                    <span class="open-order-row__name">{{ order.first_name }} {{ order.last_name }}</span>
+                    <span class="open-order-row__id">#{{ order.order_id }}</span>
+                </div>
+                <div class="open-order-row__meta">
+                    {% if order.abholzeit %}<span class="badge badge-blue">{{ order.abholzeit }}</span>{% endif %}
+                    {% if order.togo %}<span class="badge badge-orange">To-Go</span>{% endif %}
+                    <span class="open-order-row__price">{{ "%.2f"|format(order.net_total|float) }}&thinsp;€</span>
+                </div>
+                <div class="open-order-row__items">
+                    {% for item in order.items %}{{ item.quantity }}× {{ item.name }}{% if not loop.last %} · {% endif %}{% endfor %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="text-center py-10" style="color:var(--color-accent); font-size:var(--text-lg); font-weight:var(--font-semibold);">
+            Alle Bestellungen abgeholt!
+        </p>
+        {% endif %}
+    </div>
+
+    <!-- Produkte noch ausstehend -->
+    <div x-show="subtab === 'produkte'" x-cloak>
+        {% if product_totals %}
+        <div class="product-total-list">
+            {% for p in product_totals %}
+            <div class="product-total-row">
+                <span class="product-total-row__name">{{ p.name }}</span>
+                <span class="product-total-row__qty">{{ p.quantity }}</span>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="text-center py-10" style="color:var(--color-accent); font-size:var(--text-lg); font-weight:var(--font-semibold);">
+            Alle Produkte abgeholt!
+        </p>
+        {% endif %}
+    </div>
+
+    <!-- Zuletzt abgeholt -->
+    <div x-show="subtab === 'zuletzt'" x-cloak>
+        {% if recent_pickups %}
+        <div class="recent-pickup-list">
+            {% for order in recent_pickups %}
+            <div class="recent-pickup-row">
+                <div class="recent-pickup-row__main">
+                    <span class="recent-pickup-row__name">{{ order.first_name }} {{ order.last_name }}</span>
+                    <span class="recent-pickup-row__id">#{{ order.order_id }}</span>
+                    <span class="recent-pickup-row__time">{{ order.picked_up_at.strftime("%H:%M") if order.picked_up_at else "" }}</span>
+                </div>
+                <div class="recent-pickup-row__items">
+                    {% for item in order.items %}{{ item.quantity }}× {{ item.name }}{% if not loop.last %} · {% endif %}{% endfor %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="text-center py-10 text-tertiary" style="font-size:var(--text-lg);">
+            Noch keine Abholungen.
+        </p>
+        {% endif %}
+    </div>
 </div>
-{% else %}
-<p class="text-center py-10 text-tertiary" style="font-size:var(--text-lg);">
-    Noch keine Bestellungen importiert.
-</p>
-{% endif %}

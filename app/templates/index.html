@@ -10,7 +10,18 @@
     ></div>
 </div>
 
-<div x-data="{ tab: 'search' }">
+<div x-data="{ tab: 'search' }"
+     @switch-to-order.window="
+         tab = 'search';
+         $nextTick(() => {
+             const input = document.querySelector('[name=q]');
+             if (input) {
+                 input.value = $event.detail.orderId;
+                 htmx.trigger(input, 'input');
+                 input.focus();
+             }
+         })
+     ">
     <div class="tab-bar mb-4">
         <button class="tab-btn" :class="{ 'tab-btn--active': tab === 'search' }" @click="tab = 'search'">
             Suche
