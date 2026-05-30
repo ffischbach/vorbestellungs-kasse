@@ -2,11 +2,15 @@
     <div class="stats-row">
         <div class="stat-item stat-item--green">
             <div class="stat-item__value">{{ stats.picked_up }}</div>
-            <div class="stat-item__label">Abgeholt</div>
+            <div class="stat-item__label">Bezahlt</div>
         </div>
         <div class="stat-item">
             <div class="stat-item__value">{{ stats.open }}</div>
             <div class="stat-item__label">Offen</div>
+        </div>
+        <div class="stat-item stat-item--warning">
+            <div class="stat-item__value">{{ stats.waiting_handout }}</div>
+            <div class="stat-item__label">Bei Ausgabe</div>
         </div>
         <div class="stat-item stat-item--muted">
             <div class="stat-item__value">{{ stats.total }}</div>

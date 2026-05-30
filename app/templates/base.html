@@ -23,7 +23,10 @@
 <body class="min-h-screen">
     <header class="app-header">
         <div class="app-header__inner">
-            <span class="app-header__title">Vorbestellungs-Kasse</span>
+            <nav class="app-header__nav">
+                <a href="/" class="app-header__nav-link {% if active_page == 'kasse' %}app-header__nav-link--active{% endif %}">Kasse</a>
+                <a href="/ausgabe" class="app-header__nav-link {% if active_page == 'ausgabe' %}app-header__nav-link--active{% endif %}">Ausgabe</a>
+            </nav>
             <div class="app-header__actions">
                 <div
                     id="printer-status"
