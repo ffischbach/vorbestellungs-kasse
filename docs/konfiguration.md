@@ -15,6 +15,14 @@ Kein Code ändern nötig.
 
 ---
 
+## Sicherheit
+
+| Variable | Default | Beschreibung |
+|---|---|---|
+| `ADMIN_PASSWORD` | `bitte-aendern` | Passwort für `/admin` – **unbedingt ändern**. Benutzername ist immer `admin`. |
+
+---
+
 ## Labels
 
 | Variable | Default | Beschreibung |
@@ -73,3 +81,4 @@ Nur relevant für `scripts/prepare.sh`.
 | `DATABASE_URL` | `sqlite:///./data/vorbestellungs-kasse.db` | Datenbankpfad |
 | `PRINTER_DEVICE` | `/dev/usb/lp0` | USB-Gerätepfad des Druckers |
 | `PRINTER_ENABLED` | `true` | `false` zum Deaktivieren (z. B. für Tests) |
+| `PRINTER_FONT` | `a` | `a` = normal (42 Zeichen/Zeile), `b` = klein (52 Zeichen/Zeile) |
