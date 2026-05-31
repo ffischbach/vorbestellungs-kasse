@@ -28,7 +28,7 @@
         {% if order.picked_up %}
         <div class="order-card__done-footer">
             <span class="order-card__done-label">
-                Abgeholt · {% if order.picked_up_at %}<time data-utc="{{ order.picked_up_at.isoformat() }}"></time>{% endif %}
+                Abgeholt · {% if order.picked_up_at %}<time data-utc="{{ order.picked_up_at | utc_iso }}"></time>{% endif %}
             </span>
             <button
                 class="btn-reprint"

@@ -97,7 +97,7 @@
                 <div class="recent-pickup-row__main">
                     <span class="recent-pickup-row__name">{{ order.first_name }} {{ order.last_name }}</span>
                     <span class="recent-pickup-row__id">#{{ order.order_id }}</span>
-                    <span class="recent-pickup-row__time">{% if order.picked_up_at %}<time data-utc="{{ order.picked_up_at.isoformat() }}"></time>{% endif %}</span>
+                    <span class="recent-pickup-row__time">{% if order.picked_up_at %}<time data-utc="{{ order.picked_up_at | utc_iso }}"></time>{% endif %}</span>
                 </div>
                 <div class="recent-pickup-row__items">
                     {% for item in order.items %}{{ item.quantity }}× {{ item.name }}{% if not loop.last %} · {% endif %}{% endfor %}
