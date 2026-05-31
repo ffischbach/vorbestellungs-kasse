@@ -69,7 +69,7 @@ class OrderRepository:
         return order
 
     def bulk_create(self, orders: list[Order]) -> int:
-        self.db.bulk_save_objects(orders)
+        self.db.add_all(orders)
         self.db.commit()
         return len(orders)
 
