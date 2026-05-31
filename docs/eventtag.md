@@ -16,7 +16,7 @@ Den Hotspot-Namen und das Passwort vorher notieren:
 - [ ] Drucker-Status oben rechts prüfen → muss **«Drucker bereit»** anzeigen
 - [ ] Weitere Tablets verbinden: WLAN → Browser → `http://kasse.local:8000`
 
-> **Kassensicht:** Tab **Kasse** → Suche nach Name, E-Mail oder Nummer → Abholen-Button tippt Bon aus.  
+> **Kassensicht:** Tab **Kasse** → Suche nach Name, E-Mail oder Nummer → Bezahlen-Button tippt Bon aus.  
 > Tab **Ausgabe** (Smartphone) zeigt offene Bestellungen nach Zeitfenster sortiert.
 >
 > ![Ausgabe-Tab auf dem Smartphone](screenshots/ausgabe–fischerfest.png)

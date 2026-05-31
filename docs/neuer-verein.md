@@ -103,7 +103,7 @@ curl -X POST http://localhost:8000/admin/import -F "file=@data/example.csv"
 curl -X POST http://localhost:8000/admin/import -F "file=@data/example_line_items.csv"
 ```
 
-Danach [http://localhost:8000](http://localhost:8000) öffnen und Suche + Abholung prüfen.
+Danach [http://localhost:8000](http://localhost:8000) öffnen und Suche + Zahlung prüfen.
 
 ---
 

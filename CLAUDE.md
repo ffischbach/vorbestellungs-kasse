@@ -113,9 +113,10 @@ Formate (gesteuert via `CSV_FORMAT`):
    └── Treffer wird angezeigt:
        Kundenname, Bestellnummer, Abholzeit, alle Artikel + Mengen, Gesamtsumme
    └── Kunde zahlt bar
-   └── Mitarbeiter bestätigt Abholung mit einem Tap
+   └── Mitarbeiter bestätigt Zahlung mit einem Tap
        ├── Bon wird automatisch gedruckt
-       └── Bestellung wird als „abgeholt" markiert (mit Zeitstempel, dauerhaft)
+       ├── Bestellung wird als „bezahlt" markiert (mit Zeitstempel, dauerhaft)
+       └── Bestellung erscheint automatisch in der Ausgabe-Ansicht
 
 4. NACH dem Event
    Pi sauber herunterfahren
@@ -143,14 +144,14 @@ Max Mustermann
 Gesamt:        42,00 €
 Abholzeit:     11:00 – 12:00
 ──────────────────────────────
-Abgeholt: 14.06.2025  11:23
+Bezahlt:  14.06.2025  11:23
 Bon-Nr.:  #2234
 ```
 
 - Alle bestellten Produkte mit Menge
 - Bestellsumme (`net_total`)
 - Abholzeitfenster (`abholzeit`), falls vorhanden
-- Abholzeitpunkt (Uhrzeit der Bestätigung durch Mitarbeiter)
+- Zahlungszeitpunkt (Uhrzeit der Bestätigung durch Mitarbeiter)
 
 ---
 
@@ -168,14 +169,14 @@ Bon-Nr.:  #2234
   (erleichtert Stoßzeiten-Management)
 
 ### Bestellstatus
-- Klar sichtbar ob eine Bestellung **offen** oder **abgeholt** ist
-- Abgeholte Bestellungen sind durchgestrichen oder ausgegraut – weiterhin
+- Klar sichtbar ob eine Bestellung **offen** oder **bezahlt** ist
+- Bezahlte Bestellungen sind durchgestrichen oder ausgegraut – weiterhin
   sichtbar und auffindbar
-- Doppeltes Abholen wird mit einer eindeutigen Fehlermeldung verhindert
+- Doppeltes Bezahlen wird mit einer eindeutigen Fehlermeldung verhindert
 
 ### Übersicht
-- Zähler: wie viele Bestellungen offen / abgeholt / gesamt
-- Filterbar nach Status (alle / nur offen / nur abgeholt)
+- Zähler: wie viele Bestellungen offen / bezahlt / gesamt
+- Filterbar nach Status (alle / nur offen / nur bezahlt)
 
 ### Systemstatus
 - Jederzeit sichtbar ob Drucker verbunden und betriebsbereit ist
@@ -239,12 +240,12 @@ Das System gilt als fertig wenn:
 - [ ] CSV-Import aus WooCommerce-Export funktioniert zuverlässig
 - [ ] Suche nach Name, E-Mail und Bestellnummer funktioniert (inkl. Teilstrings)
 - [ ] Bestelldetails werden vollständig angezeigt (Artikel, Mengen, Summe, Abholzeit)
-- [ ] Bestellung kann mit einem Tap abgeholt werden
+- [ ] Bestellung kann mit einem Tap als bezahlt markiert werden
 - [ ] Bon wird automatisch gedruckt (Produkte, Mengen, Summe, Abholzeit)
-- [ ] Doppeltes Abholen ist zuverlässig verhindert
+- [ ] Doppeltes Bezahlen ist zuverlässig verhindert
 - [ ] Mehrere Tablets können parallel genutzt werden ohne Konflikte
 - [ ] System läuft stabil 4–8 Stunden ohne Eingriff
-- [ ] Druckerfehler blockiert nicht den Abholprozess
+- [ ] Druckerfehler blockiert nicht den Bezahlprozess
 - [ ] Aufbau am Eventtag dauert unter 15 Minuten
 - [ ] Ein Vereinsmitglied ohne IT-Kenntnis kann die Oberfläche bedienen
 
