@@ -73,18 +73,20 @@ document.addEventListener('alpine:init', () => {
     </div>
 </div>
 
-<div style="display:none;" x-data x-init="
-    const es = new EventSource('/events');
-    es.onmessage = e => {
-        const d = JSON.parse(e.data);
-        if (d.type === 'pickup' || d.type === 'handout') {
-            htmx.ajax('GET', '/orders/stats', {target: document.getElementById('stats'), swap: 'innerHTML'});
-            htmx.ajax('GET', '/orders/overview', {target: document.getElementById('overview-content'), swap: 'innerHTML'});
-        }
-        if (d.type === 'pickup') {
-            const card = document.querySelector(`[data-order-id="${d.order_id}"]`);
-            if (card) htmx.ajax('GET', `/orders/${d.order_id}/card`, {target: card, swap: 'outerHTML'});
-        }
-    };
-"></div>
+<script>
+    (function() {
+        const es = new EventSource('/events');
+        es.onmessage = e => {
+            const d = JSON.parse(e.data);
+            if (d.type === 'pickup' || d.type === 'handout') {
+                htmx.ajax('GET', '/orders/stats', {target: document.getElementById('stats'), swap: 'innerHTML'});
+                htmx.ajax('GET', '/orders/overview', {target: document.getElementById('overview-content'), swap: 'innerHTML'});
+            }
+            if (d.type === 'pickup') {
+                const card = document.querySelector(`[data-order-id="${d.order_id}"]`);
+                if (card) htmx.ajax('GET', `/orders/${d.order_id}/card`, {target: card, swap: 'outerHTML'});
+            }
+        };
+    })();
+</script>
 {% endblock %}
