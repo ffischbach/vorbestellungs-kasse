@@ -66,7 +66,7 @@ Dauert beim ersten Mal 5–15 Minuten. Nur einmalig nötig.
 ## Schritt 4 – Repository klonen
 
 ```bash
-git clone https://github.com/ASG-Ettlingen/fischverkauf.git ~/vorbestellungs-kasse
+git clone https://github.com/ffischbach/vorbestellungs-kasse.git ~/vorbestellungs-kasse
 cd ~/vorbestellungs-kasse
 ```
 
@@ -155,15 +155,6 @@ sudo reboot
 
 ## CSV importieren (vor jedem Event)
 
-Bestellungen aus WooCommerce exportieren und auf den Pi übertragen:
+CSV-Datei auf den Pi übertragen und über die Admin-Oberfläche unter `/admin` importieren.
 
-```bash
-# Von deinem Laptop aus:
-scp bestellungen.csv pi@fischerfest.local:~/vorbestellungs-kasse/data/
-
-# Auf dem Pi importieren:
-curl -X POST http://localhost:8000/admin/import \
-  -F "file=@data/bestellungen.csv"
-```
-
-Oder über die Admin-Oberfläche im Browser unter `/admin`.
+Vollständige Schritte: → [docs/eventtag.md](eventtag.md)

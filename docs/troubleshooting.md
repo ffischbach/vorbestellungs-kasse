@@ -48,9 +48,8 @@ Die App zeigt **«Drucker nicht verbunden»**.
    ```
    Wenn `/dev/usb/lp0` fehlt: Pi neu starten, dann Seite neu laden.
 
-Der Druckerfehler blockiert die Abholung nicht — Bestellungen können trotzdem
-abgeholt werden. Die App zeigt den Fehler an, markiert die Bestellung aber trotzdem
-als abgeholt und sie tauchen auf der Ausgabe-Seite auf.
+Der Druckerfehler blockiert die Abholung nicht — die App zeigt den Fehler an
+und markiert die Bestellung trotzdem als abgeholt.
 
 ---
 

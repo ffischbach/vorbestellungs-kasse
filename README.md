@@ -50,24 +50,15 @@ graph LR
 
 ## Für euren Verein
 
-Das System ist generisch gebaut – nicht nur für Fischerfeste.
-
-**CSV-Format anpassen:** zwei Formate werden unterstützt:
-
-| Format | Geeignet für | Beschreibung |
-|---|---|---|
-| `pivoted` _(Standard)_ | WooCommerce | Eine Zeile pro Bestellung, Produkte als Spaltenpaare `item_1`/`quantity_1` … |
-| `line_items` | Shopify, Pretix, Eventbrite | Eine Zeile pro Artikel, `order_id` wiederholt sich |
-
-Spaltennamen lassen sich einzeln anpassen. Details: → [docs/neuer-verein.md](docs/neuer-verein.md)
-
-**Namen und Jahr einstellen:** Drei Zeilen in einer `.env`-Datei:
+Das System ist generisch gebaut – nicht nur für Fischerfeste. Drei Zeilen in `.env` reichen für den Anfang:
 
 ```env
 VEREINSNAME=Euer Verein
 EVENT_NAME=Euer Event
 EVENT_JAHR=2026
 ```
+
+Unterstützt werden CSV-Exporte aus WooCommerce, Shopify, Pretix, Eventbrite und eigenen Systemen. Alle Spaltennamen sind konfigurierbar. Details und Schritt-für-Schritt-Anleitung: → [docs/neuer-verein.md](docs/neuer-verein.md)
 
 **Einmalig einrichten, jedes Jahr nutzen:** Nach dem ersten Setup startet der Pi autonom. Kein Wartungsaufwand zwischen den Events.
 
@@ -101,7 +92,7 @@ EVENT_JAHR=2026
 Das System läuft auf jedem Laptop – ideal um es vor dem Event zu testen oder für einen anderen Verein anzupassen.
 
 ```bash
-git clone https://github.com/ASG-Ettlingen/fischverkauf.git
+git clone https://github.com/ffischbach/vorbestellungs-kasse.git
 cd fischverkauf
 uv sync --group dev
 cp .env.example .env
@@ -138,12 +129,6 @@ Ersteinrichtung (einmalig, mit Internet): → [docs/einrichtung.md](docs/einrich
 ## Konfiguration
 
 Vollständige Referenz aller `.env`-Variablen: → [docs/konfiguration.md](docs/konfiguration.md)
-
-| Variable | Beispiel |
-|---|---|
-| `VEREINSNAME` | `ASG Ettlingen` |
-| `EVENT_NAME` | `Fischerfest` |
-| `EVENT_JAHR` | `2026` |
 
 ---
 
