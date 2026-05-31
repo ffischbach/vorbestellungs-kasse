@@ -1,3 +1,5 @@
+from collections.abc import Generator
+
 import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
@@ -16,7 +18,7 @@ TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engin
 
 
 @pytest.fixture
-def db() -> pytest.FixtureRequest:
+def db() -> Generator[Session, None, None]:
     Base.metadata.create_all(bind=engine)
     session = TestingSessionLocal()
     try:
@@ -27,8 +29,8 @@ def db() -> pytest.FixtureRequest:
 
 
 @pytest.fixture
-def client(db: Session) -> pytest.FixtureRequest:
-    def override_get_db():
+def client(db: Session) -> Generator[TestClient, None, None]:
+    def override_get_db() -> Generator[Session, None, None]:
         yield db
 
     app.dependency_overrides[get_db] = override_get_db
