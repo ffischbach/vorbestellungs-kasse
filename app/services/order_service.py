@@ -26,20 +26,11 @@ class OrderAlreadyHandedOutError(Exception):
 class OrderService:
     def __init__(self, db: Session) -> None:
         self.repo = OrderRepository(db)
-        self.printer = PrinterService()
 
     def search(self, query: str) -> list[Order]:
         if len(query) < 2:
             return []
         return self.repo.search(query)
-
-    def get_all(self, status: str | None = None) -> list[Order]:
-        orders = self.repo.get_all()
-        if status == "open":
-            return [o for o in orders if not o.picked_up]
-        if status == "picked_up":
-            return [o for o in orders if o.picked_up]
-        return orders
 
     def get_stats(self) -> dict[str, int]:
         return self.repo.count()
@@ -85,7 +76,7 @@ class OrderService:
 
         printer_error: str | None = None
         try:
-            self.printer.print_receipt(order)
+            PrinterService().print_receipt(order)
         except Exception as e:
             printer_error = str(e)
 
@@ -103,7 +94,7 @@ class OrderService:
 
         printer_error: str | None = None
         try:
-            self.printer.print_receipt(order)
+            PrinterService().print_receipt(order)
         except Exception as e:
             printer_error = str(e)
 
