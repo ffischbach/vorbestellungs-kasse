@@ -56,22 +56,26 @@ Bestellungen ab und bezahlen bar.
 
 ---
 
-## Datenbasis – CSV-Export aus WooCommerce
+## Datenbasis – CSV-Export
 
-Die Vorbestellungen werden per SQL-Query aus WordPress/WooCommerce exportiert
-und als CSV bereitgestellt. Das Format ist **zeilenweise pro Bestellung**
-(pivotiert), mit bis zu 10 Produktspalten.
+Die Vorbestellungen werden als CSV bereitgestellt. Das System unterstützt zwei
+Formate (gesteuert via `CSV_FORMAT`):
 
-### CSV-Spalten
+- **`pivoted`** (Standard, WooCommerce): Eine Zeile pro Bestellung, Produkte
+  als Spaltenpaare `item_1`/`quantity_1` … `item_10`/`quantity_10`
+- **`line_items`** (Shopify, Pretix, Eventbrite …): Eine Zeile pro Artikel,
+  mehrere Zeilen pro Bestellung
+
+### CSV-Spalten (pivoted / WooCommerce)
 
 | Spalte | Typ | Beschreibung |
 |---|---|---|
-| `order_id` | Integer (z.B. `2234`) | Eindeutige Bestellnummer aus WooCommerce |
+| `order_id` | Integer (z.B. `2234`) | Eindeutige Bestellnummer |
 | `net_total` | Decimal | Bestellsumme (netto) |
 | `first_name` | String | Vorname des Kunden |
 | `last_name` | String | Nachname des Kunden |
 | `email` | String | E-Mail-Adresse des Kunden |
-| `customer_id` | Integer | Interne WooCommerce-Kunden-ID |
+| `customer_id` | Integer | Interne Kunden-ID |
 | `abholzeit` | String | Gebuchtes Abholzeitfenster (custom field) |
 | `togo` | String | To-go-Kennzeichnung (custom field) |
 | `num_items_sold` | Integer | Anzahl der bestellten Artikel (gesamt) |
@@ -81,12 +85,9 @@ und als CSV bereitgestellt. Das Format ist **zeilenweise pro Bestellung**
 | `quantity_1` … `quantity_10` | Integer | Menge zum jeweiligen Produkt |
 
 ### Hinweise zum Format
-- Eine Bestellung = eine Zeile, Produkte sind als Spaltenpaare (`item_N` /
-  `quantity_N`) abgelegt
-- Maximal 10 Produkte pro Bestellung
+- Spaltennamen sind über `CSV_COL_*`-Variablen in `.env` konfigurierbar
 - Leere Produkt-Slots (`item_N` = NULL) werden beim Import ignoriert
 - `abholzeit` kann leer sein (kein Zeitfenster gebucht)
-- `togo` Bedeutung und Wertebereich noch zu klären (siehe Offene Fragen)
 
 ---
 
@@ -179,6 +180,11 @@ Bon-Nr.:  #2234
 ### Systemstatus
 - Jederzeit sichtbar ob Drucker verbunden und betriebsbereit ist
 
+### Admin-Bereich (`/admin`)
+- Geschützt mit HTTP Basic Auth (Benutzername: `admin`, Passwort: `ADMIN_PASSWORD`)
+- CSV importieren (mit Vorschau des Formats und Beispiel-Download)
+- Alle Bestellungen zurücksetzen (Datenbank leeren)
+
 ---
 
 ## Nicht-funktionale Anforderungen
@@ -249,7 +255,7 @@ Das System gilt als fertig wenn:
 | Schicht | Technologie | Begründung |
 |---|---|---|
 | Backend | Python 3.11 + FastAPI + Uvicorn | Vorinstalliert auf Pi OS, schnell, async |
-| Datenbank | SQLite (WAL-Modus) | Kein Server, dateibasiert, concurrent-safe |
+| Datenbank | SQLite (WAL-Modus) + Alembic | Kein Server, dateibasiert, concurrent-safe; Migrationen automatisch beim Start |
 | Frontend | HTMX + Alpine.js + Tailwind CSS | Kein Build-Schritt, offline-fähig, lokal gebundelt |
 | Echtzeit | Server-Sent Events (SSE) | Pickup-Events an alle Tablets ohne WebSocket-Overhead |
 | Drucker | python-escpos | ESC/POS-Protokoll, TM-T20III über USB |
@@ -266,37 +272,65 @@ Tailwind v2 wird als vollständig pre-built CSS ausgeliefert (kein Build-Schritt
 
 ```
 fischverkauf/
-├── .github/workflows/ci.yml    # GitHub Actions CI
+├── .github/workflows/ci.yml       # GitHub Actions CI
+├── alembic/                       # Datenbankmigrationen
+├── alembic.ini                    # Alembic-Konfiguration
 ├── app/
-│   ├── main.py                 # FastAPI App, Lifespan
-│   ├── config.py               # Zentrale Konfiguration (pydantic-settings)
-│   ├── database.py             # SQLite Engine, WAL-Modus, get_db()
-│   ├── models/order.py         # SQLAlchemy ORM-Modell
-│   ├── schemas/order.py        # Pydantic-Schemas (Request/Response)
-│   ├── repositories/           # Datenzugriff (alle SQL-Queries hier)
+│   ├── main.py                    # FastAPI App, Lifespan (führt Alembic-Migrationen aus)
+│   ├── config.py                  # Zentrale Konfiguration (pydantic-settings)
+│   ├── database.py                # SQLite Engine, WAL-Modus, get_db()
+│   ├── jinja.py                   # Jinja2-Templates-Instanz
+│   ├── models/order.py            # SQLAlchemy ORM-Modell
+│   ├── schemas/order.py           # Pydantic-Schemas (Request/Response)
+│   ├── repositories/              # Datenzugriff (alle SQL-Queries hier)
 │   │   └── order_repository.py
-│   ├── services/               # Business-Logik
-│   │   ├── order_service.py    # Abholflow, Suche, Stats
-│   │   ├── printer_service.py  # ESC/POS-Druck
-│   │   └── csv_import_service.py
-│   ├── routers/                # HTTP-Endpunkte
-│   │   ├── orders.py           # Suche, Abholung, Stats
-│   │   ├── admin.py            # CSV-Import, Druckerstatus
-│   │   └── sse.py              # Server-Sent Events
-│   └── templates/              # Jinja2 HTML (HTMX-Partials)
+│   ├── services/                  # Business-Logik
+│   │   ├── order_service.py       # Abholflow, Suche, Stats
+│   │   ├── printer_service.py     # ESC/POS-Druck
+│   │   └── csv_import_service.py  # Import für pivoted + line_items Format
+│   ├── routers/                   # HTTP-Endpunkte
+│   │   ├── orders.py              # Suche, Abholung, Stats
+│   │   ├── admin.py               # CSV-Import, Reset (HTTP Basic Auth)
+│   │   └── sse.py                 # Server-Sent Events
+│   └── templates/                 # Jinja2 HTML (HTMX-Partials)
 │       ├── base.html
-│       ├── index.html
+│       ├── index.html             # Kassensicht
+│       ├── admin.html             # Admin-Bereich
+│       ├── ausgabe.html           # Ausgabeliste
 │       └── partials/
-├── static/                     # JS/CSS lokal (kein CDN)
+│           ├── order_card.html
+│           ├── order_list.html
+│           ├── ausgabe_card.html
+│           ├── ausgabe_list.html
+│           ├── overview.html
+│           ├── stats.html
+│           ├── printer_status.html
+│           ├── import_result.html
+│           ├── reset_result.html
+│           └── error.html
+├── static/                        # JS/CSS lokal (kein CDN)
+│   ├── htmx.min.js
+│   ├── alpine.min.js
+│   ├── tailwind.min.css
+│   └── app.css
 ├── tests/
-│   ├── conftest.py             # pytest fixtures (In-Memory SQLite)
+│   ├── conftest.py                # pytest fixtures (In-Memory SQLite)
 │   ├── test_orders.py
-│   └── test_csv_import.py
-├── data/                       # SQLite DB + CSV – nicht ins Repo!
-├── systemd/fischverkauf.service
-├── scripts/prepare.sh          # Einmaliges Setup mit Internet (zuhause)
-├── scripts/status.sh           # Optionaler Statuscheck am Eventtag
-├── pyproject.toml              # Dependencies + Tool-Konfiguration
+│   ├── test_csv_import.py
+│   └── testdata/                  # Beispiel-CSVs für Tests
+├── data/                          # SQLite DB + CSV – nicht ins Repo!
+├── docs/                          # Betriebsdokumentation
+│   ├── einrichtung.md             # Pi-Setup Schritt für Schritt
+│   ├── eventtag.md                # Checkliste Eventtag
+│   ├── konfiguration.md           # Alle .env-Variablen erklärt
+│   ├── neuer-verein.md            # Anpassung für andere Vereine/Events
+│   └── troubleshooting.md
+├── systemd/vorbestellungs-kasse.service
+├── scripts/
+│   ├── prepare.sh                 # Einmaliges Setup mit Internet (zuhause)
+│   ├── status.sh                  # Optionaler Statuscheck am Eventtag
+│   └── sync.sh                    # Lokale Änderungen per rsync auf den Pi übertragen
+├── pyproject.toml                 # Dependencies + Tool-Konfiguration
 └── .env.example
 ```
 
@@ -349,10 +383,15 @@ uv run mypy app         # Typchecks
 
 ### Datenbankmigrationen (Alembic)
 
-Für Schema-Änderungen **immer** Alembic verwenden, nie manuell SQL patchen.
-Die initiale Tabelle wird via `Base.metadata.create_all()` beim ersten Start
-angelegt. Alembic ist in den Dependencies enthalten und bereit für den ersten
-`alembic init`.
+Alembic läuft **automatisch beim App-Start** (`lifespan` in `main.py` führt
+`alembic upgrade head` aus). Für neue Migrationen:
+
+```bash
+uv run alembic revision --autogenerate -m "beschreibung"
+uv run alembic upgrade head   # lokal anwenden
+```
+
+Nie manuell SQL patchen – immer Alembic verwenden.
 
 ---
 
@@ -380,13 +419,48 @@ Vor jedem Commit laufen automatisch `ruff` (Lint + Fix) und Format-Checks.
 Alle konfigurierbaren Werte stehen in `.env` (aus `.env.example` kopieren).
 Nie Konfigurationswerte hardcoden – immer `app/config.py` nutzen.
 
+### Veranstaltung & App
+
 | Variable | Default | Beschreibung |
 |---|---|---|
 | `VEREINSNAME` | `ASG Ettlingen` | Erscheint auf dem Bon |
+| `EVENT_NAME` | `Veranstaltung` | Veranstaltungsname (z.B. `Fischerfest`) |
 | `EVENT_JAHR` | `2026` | Erscheint auf dem Bon |
-| `DATABASE_URL` | `sqlite:///./data/fischverkauf.db` | Datenbankpfad |
+| `ADMIN_PASSWORD` | `admin` | Passwort für den Admin-Bereich (`/admin`) |
+
+### Datenbank & Server
+
+| Variable | Default | Beschreibung |
+|---|---|---|
+| `DATABASE_URL` | `sqlite:///./data/vorbestellungs-kasse.db` | Datenbankpfad |
+| `HOST` | `0.0.0.0` | Bind-Adresse des Servers |
+| `PORT` | `8000` | Port des Servers |
+
+### Drucker
+
+| Variable | Default | Beschreibung |
+|---|---|---|
 | `PRINTER_DEVICE` | `/dev/usb/lp0` | USB-Gerätepfad Drucker |
 | `PRINTER_ENABLED` | `true` | Druck deaktivieren (z.B. für Tests) |
+| `PRINTER_FONT` | `b` | `a` = normal (42 Zeichen/Zeile), `b` = klein (52 Zeichen/Zeile) |
+
+### CSV-Import
+
+| Variable | Default | Beschreibung |
+|---|---|---|
+| `CSV_FORMAT` | `pivoted` | `pivoted` = WooCommerce-Standard; `line_items` = Shopify/Pretix/Eventbrite |
+| `CSV_COL_ORDER_ID` | `order_id` | Spaltennamen konfigurierbar – Details in `.env.example` |
+
+Alle `CSV_COL_*`-Variablen erlauben die Anpassung an abweichende Spaltennamen.
+Vollständige Liste in `.env.example` und `docs/konfiguration.md`.
+
+### Infrastruktur (für `scripts/prepare.sh`)
+
+| Variable | Default | Beschreibung |
+|---|---|---|
+| `PI_HOSTNAME` | `kasse` | Netzwerkname des Pi (erreichbar als `kasse.local`) |
+| `HOTSPOT_SSID` | `MeinVerein` | WLAN-Name des Hotspots |
+| `HOTSPOT_PASSWORD` | `MeinPasswort2026` | WLAN-Passwort |
 
 ---
 
@@ -403,15 +477,18 @@ bash scripts/prepare.sh
 git pull
 bash scripts/prepare.sh
 
+# Lokale Änderungen direkt per rsync übertragen (Entwicklung)
+bash scripts/sync.sh [pi@kasse.local]
+
 # Am Eventtag: Pi starten – alles läuft automatisch
 # Optional: Systemstatus und URL anzeigen
 bash scripts/status.sh
 
 # Logs prüfen
-sudo journalctl -u fischverkauf -f
+sudo journalctl -u vorbestellungs-kasse -f
 
-# CSV importieren (Admin-Endpunkt)
-curl -X POST http://localhost:8000/admin/import \
+# CSV importieren (Admin-Endpunkt, HTTP Basic Auth)
+curl -u admin:PASSWORT -X POST http://localhost:8000/admin/import \
   -F "file=@bestellungen.csv"
 ```
 
