@@ -12,6 +12,7 @@ from app.services.order_service import (
     OrderNotPickedUpError,
     OrderService,
 )
+from app.services.printer_service import PrinterService
 
 router = APIRouter()
 
@@ -19,6 +20,14 @@ router = APIRouter()
 @router.get("/", response_class=HTMLResponse)
 async def index(request: Request) -> HTMLResponse:
     return templates.TemplateResponse(request, "index.html", {"active_page": "kasse"})
+
+
+@router.get("/printer-status", response_class=HTMLResponse)
+async def printer_status(request: Request) -> HTMLResponse:
+    printer = PrinterService()
+    return templates.TemplateResponse(
+        request, "partials/printer_status.html", {"available": printer.is_available()}
+    )
 
 
 @router.get("/ausgabe", response_class=HTMLResponse)

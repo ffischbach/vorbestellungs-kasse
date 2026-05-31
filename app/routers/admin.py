@@ -10,7 +10,6 @@ from app.database import get_db
 from app.jinja import templates
 from app.repositories.order_repository import OrderRepository
 from app.services.csv_import_service import CsvImportService
-from app.services.printer_service import PrinterService
 
 router = APIRouter(prefix="/admin", tags=["admin"])
 _security = HTTPBasic()
@@ -32,14 +31,6 @@ def _require_admin(credentials: HTTPBasicCredentials = Depends(_security)) -> No
 @router.get("", response_class=HTMLResponse, dependencies=[Depends(_require_admin)])
 async def admin_page(request: Request) -> HTMLResponse:
     return templates.TemplateResponse(request, "admin.html")
-
-
-@router.get("/status", response_class=HTMLResponse)
-async def printer_status(request: Request) -> HTMLResponse:
-    printer = PrinterService()
-    return templates.TemplateResponse(
-        request, "partials/printer_status.html", {"available": printer.is_available()}
-    )
 
 
 @router.post("/import", response_class=HTMLResponse, dependencies=[Depends(_require_admin)])
