@@ -34,11 +34,17 @@ graph LR
     TAB2["📱 Tablet · Kasse 2"]
     TAB3["📱 Smartphone · Kasse 3"]
     PRINTER["🖨️ Epson TM-T20III"]
+    AUS1["📱 Smartphone · Ausgabe 1"]
+    AUS2["📱 Smartphone · Ausgabe 2"]
+    AUS3["📱 Tablet · Ausgabe 3"]
 
     CSV -->|"Upload vor dem Event"| APP
     HOTSPOT <-->|"WLAN"| TAB1
     HOTSPOT <-->|"WLAN"| TAB2
     HOTSPOT <-->|"WLAN"| TAB3
+    HOTSPOT <-->|"WLAN"| AUS1
+    HOTSPOT <-->|"WLAN"| AUS2
+    HOTSPOT <-->|"WLAN"| AUS3
     APP -->|"USB · ESC/POS"| PRINTER
 ```
 
