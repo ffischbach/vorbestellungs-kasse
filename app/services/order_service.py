@@ -88,7 +88,7 @@ class OrderService:
         if not order:
             raise OrderNotFoundError(f"Bestellung #{order_id} nicht gefunden")
         if order.picked_up:
-            raise OrderAlreadyPickedUpError(f"Bestellung #{order_id} wurde bereits abgeholt")
+            raise OrderAlreadyPickedUpError(f"Bestellung #{order_id} wurde bereits bezahlt")
 
         order = self.repo.mark_picked_up(order, datetime.now(UTC))
 

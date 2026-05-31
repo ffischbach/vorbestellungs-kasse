@@ -15,7 +15,7 @@
                 <div class="slot-row__head">
                     <span class="slot-row__time">{{ slot.abholzeit }}</span>
                     {% if slot.open == 0 %}
-                        <span class="slot-row__open slot-row__open--done">Alle abgeholt</span>
+                        <span class="slot-row__open slot-row__open--done">Alle bezahlt</span>
                     {% else %}
                         <span class="slot-row__open">{{ slot.open }} offen</span>
                     {% endif %}
@@ -26,7 +26,7 @@
                     </div>
                 </div>
                 <div class="slot-row__meta">
-                    <span>{{ slot.picked_up }} abgeholt</span>
+                    <span>{{ slot.picked_up }} bezahlt</span>
                     <span>{{ slot.total }} gesamt</span>
                 </div>
             </div>
@@ -65,7 +65,7 @@
         </div>
         {% else %}
         <p class="text-center py-10" style="color:var(--color-accent); font-size:var(--text-lg); font-weight:var(--font-semibold);">
-            Alle Bestellungen abgeholt!
+            Alle Bestellungen bezahlt!
         </p>
         {% endif %}
     </div>
@@ -83,7 +83,7 @@
         </div>
         {% else %}
         <p class="text-center py-10" style="color:var(--color-accent); font-size:var(--text-lg); font-weight:var(--font-semibold);">
-            Alle Produkte abgeholt!
+            Alle Produkte bezahlt!
         </p>
         {% endif %}
     </div>
@@ -107,7 +107,7 @@
         </div>
         {% else %}
         <p class="text-center py-10 text-tertiary" style="font-size:var(--text-lg);">
-            Noch keine Abholungen.
+            Noch keine Zahlungen.
         </p>
         {% endif %}
     </div>

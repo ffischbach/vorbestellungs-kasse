@@ -28,7 +28,7 @@
         {% if order.picked_up %}
         <div class="order-card__done-footer">
             <span class="order-card__done-label">
-                Abgeholt · {% if order.picked_up_at %}<time data-utc="{{ order.picked_up_at | utc_iso }}"></time>{% endif %}
+                Bezahlt · {% if order.picked_up_at %}<time data-utc="{{ order.picked_up_at | utc_iso }}"></time>{% endif %}
             </span>
             <button
                 class="btn-reprint"
@@ -56,7 +56,7 @@
             }
         }">
             <button class="order-card__action" @click="open = true; amount = ''">
-                Abholen
+                Bezahlen
             </button>
 
             <div x-show="open" x-cloak
@@ -72,7 +72,7 @@
                 <div class="pay-sheet" role="dialog" aria-modal="true">
 
                     <div class="pay-sheet__header">
-                        <span class="pay-sheet__title">Abholung bestätigen</span>
+                        <span class="pay-sheet__title">Zahlung bestätigen</span>
                         <span class="pay-sheet__order">#{{ order.order_id }} · {{ order.first_name }} {{ order.last_name }}</span>
                     </div>
 
@@ -129,7 +129,7 @@
                             hx-swap="outerHTML"
                             hx-disabled-elt="this"
                         >
-                            Abholen &amp; Bon drucken
+                            Bezahlen &amp; Bon drucken
                         </button>
                         <button class="pay-sheet__cancel" @click="open = false">
                             Abbrechen
