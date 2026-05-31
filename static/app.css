@@ -1211,3 +1211,10 @@ body {
 /* --- UTILITY --- */
 .text-muted    { color: var(--color-text-secondary); }
 .text-tertiary { color: var(--color-text-tertiary); }
+
+.admin-link {
+  color: var(--color-text-secondary);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.admin-link:hover { color: var(--color-text-primary); }
