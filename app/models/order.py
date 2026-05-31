@@ -22,11 +22,11 @@ class Order(Base):
     togo: Mapped[str | None] = mapped_column(String, nullable=True)
     num_items_sold: Mapped[int | None] = mapped_column(Integer, nullable=True)
     returning_customer: Mapped[bool | None] = mapped_column(Boolean, nullable=True)
-    date_paid: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    date_paid: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     items: Mapped[list[dict[str, Any]]] = mapped_column(JSON, nullable=False, default=list)
 
     picked_up: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
-    picked_up_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    picked_up_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     handed_out: Mapped[bool] = mapped_column(
         Boolean, default=False, nullable=False, server_default="0"
     )

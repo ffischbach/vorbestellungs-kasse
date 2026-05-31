@@ -1,6 +1,7 @@
 import csv
 import io
 from collections import defaultdict
+from datetime import UTC, datetime
 
 from sqlalchemy.orm import Session
 
@@ -29,6 +30,17 @@ def _detect_delimiter(header: str) -> str:
         return "\t"
 
 
+def _parse_date_paid(raw: str | None) -> datetime | None:
+    if not raw:
+        return None
+    for fmt in ("%Y-%m-%d %H:%M:%S", "%Y-%m-%dT%H:%M:%S", "%Y-%m-%d"):
+        try:
+            return datetime.strptime(raw, fmt).replace(tzinfo=UTC)
+        except ValueError:
+            continue
+    return None
+
+
 def _build_order(row: dict, items: list[dict]) -> Order:
     customer_id_raw = _val(row.get("customer_id"))
     num_items_raw = _val(row.get("num_items_sold"))
@@ -42,6 +54,7 @@ def _build_order(row: dict, items: list[dict]) -> Order:
         customer_id=int(customer_id_raw) if customer_id_raw else None,
         abholzeit=_val(row.get(settings.csv_col_timeslot)),
         togo=_val(row.get(settings.csv_col_togo)),
+        date_paid=_parse_date_paid(_val(row.get(settings.csv_col_date_paid))),
         num_items_sold=int(num_items_raw) if num_items_raw else None,
         returning_customer=(
             (returning_raw in _BOOL_TRUE_VALUES) if returning_raw is not None else None

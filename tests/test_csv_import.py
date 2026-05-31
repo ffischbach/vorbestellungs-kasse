@@ -58,6 +58,18 @@ def test_parse_normalizes_email() -> None:
     assert order.email == order.email.lower()
 
 
+def test_parse_date_paid() -> None:
+    from datetime import UTC
+
+    service = CsvImportService()
+    order = service.parse(SAMPLE_TSV)[0]
+    assert order.date_paid is not None
+    assert order.date_paid.tzinfo == UTC
+    assert order.date_paid.year == 2026
+    assert order.date_paid.month == 3
+    assert order.date_paid.day == 18
+
+
 def test_import_to_db(db: Session) -> None:
     service = CsvImportService()
     count = service.import_to_db(SAMPLE_TSV, db)

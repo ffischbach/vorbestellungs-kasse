@@ -35,6 +35,7 @@ class Settings(BaseSettings):
     csv_col_email: str = "email"
     csv_col_timeslot: str = "abholzeit"
     csv_col_togo: str = "togo"
+    csv_col_date_paid: str = "date_paid"
 
     # Pivoted-Format (WooCommerce)
     csv_col_item_prefix: str = "item_"
