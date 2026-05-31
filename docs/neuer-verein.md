@@ -15,7 +15,7 @@ Kurzanleitung um das System für eine neue Organisation oder ein anderes Event e
 ## Schritt 1 – Repo klonen
 
 ```bash
-git clone https://github.com/ASG-Ettlingen/fischverkauf.git vorbestellungs-kasse
+git clone https://github.com/ffischbach/vorbestellungs-kasse.git vorbestellungs-kasse
 cd vorbestellungs-kasse
 ```
 
