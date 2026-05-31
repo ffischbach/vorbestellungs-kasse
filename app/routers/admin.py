@@ -1,7 +1,8 @@
 import secrets
+from pathlib import Path
 
 from fastapi import APIRouter, Depends, HTTPException, Request, UploadFile, status
-from fastapi.responses import HTMLResponse
+from fastapi.responses import FileResponse, HTMLResponse
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from sqlalchemy.orm import Session
 
@@ -30,7 +31,16 @@ def _require_admin(credentials: HTTPBasicCredentials = Depends(_security)) -> No
 
 @router.get("", response_class=HTMLResponse, dependencies=[Depends(_require_admin)])
 async def admin_page(request: Request) -> HTMLResponse:
-    return templates.TemplateResponse(request, "admin.html")
+    return templates.TemplateResponse(request, "admin.html", {"csv_format": settings.csv_format})
+
+
+@router.get("/example-csv", dependencies=[Depends(_require_admin)])
+async def download_example_csv() -> FileResponse:
+    filename = "example_line_items.csv" if settings.csv_format == "line_items" else "example.csv"
+    path = Path("data") / filename
+    if not path.exists():
+        raise HTTPException(status_code=404, detail="Beispiel-CSV nicht gefunden")
+    return FileResponse(path, media_type="text/csv", filename=f"beispiel_{settings.csv_format}.csv")
 
 
 @router.post("/import", response_class=HTMLResponse, dependencies=[Depends(_require_admin)])
