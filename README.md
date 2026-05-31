@@ -42,9 +42,10 @@ graph LR
     APP -->|"USB · ESC/POS"| PRINTER
 ```
 
-<!-- TODO Screenshot: Suchmaske – ein paar Bestellkarten sichtbar, eine davon bereits abgeholt (ausgegraut) → docs/screenshots/suche.png -->
+![Suchmaske: Bestellkarten, eine davon bereits abgeholt (ausgegraut)](docs/screenshots/suche.png)
 
-<!-- TODO Screenshot: Bestellkarte geöffnet – Artikelliste, Gesamtsumme, Abholzeit, Abholen-Button → docs/screenshots/bestellung.png -->
+
+![Ausgabe-Tab auf dem Smartphone – offene Bestellungen nach Zeitfenster](docs/screenshots/ausgabe–fischerfest.png)
 
 ---
 
@@ -83,7 +84,7 @@ Unterstützt werden CSV-Exporte aus WooCommerce, Shopify, Pretix, Eventbrite und
 | Epson TM-T20III (USB, 80 mm) | Bondrucker |
 | Tablets / Smartphones | Kassenoberfläche im Browser |
 
-<!-- TODO Foto: Hardware-Aufbau – Pi, Drucker und ein Tablet im echten Einsatz → docs/screenshots/hardware.jpg -->
+![Hardware-Aufbau: Epson TM-T20III, iPad und iPhone im echten Einsatz](docs/screenshots/hardware-aufbau.jpeg)
 
 ---
 
