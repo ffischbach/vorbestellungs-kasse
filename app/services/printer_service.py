@@ -1,5 +1,6 @@
 import os
 from datetime import UTC, datetime
+from zoneinfo import ZoneInfo
 
 from app.config import settings
 from app.models.order import Order
@@ -59,8 +60,9 @@ class PrinterService:
 
         p.text(sep + "\n")
 
-        ts = order.picked_up_at or datetime.now(UTC)
-        p.text(f"Abgeholt: {ts.strftime('%d.%m.%Y  %H:%M')}\n")
+        tz = ZoneInfo(settings.timezone)
+        ts = (order.picked_up_at or datetime.now(UTC)).astimezone(tz)
+        p.text(f"Bezahlt:  {ts.strftime('%d.%m.%Y  %H:%M')}\n")
         p.text(f"Bon-Nr.:  #{order.order_id}\n")
 
         p.cut()

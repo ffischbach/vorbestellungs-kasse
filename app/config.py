@@ -20,6 +20,8 @@ class Settings(BaseSettings):
     host: str = "0.0.0.0"
     port: int = 8000
 
+    timezone: str = "Europe/Berlin"
+
     # UI-Labels
     abholzeit_label: str = "Abholzeit"
     togo_label: str = "To-Go"
