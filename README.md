@@ -1,10 +1,75 @@
 # vorbestellungs-kasse
 
-Offline-Kassensystem für Vorbestellungen an Vereins- oder Gemeinde-Events.
-Kunden bestellen vorab online, holen am Eventtag ab und zahlen bar.
+Digitales Abholsystem für Vereinsevents mit Vorbestellungen. Läuft auf einem Raspberry Pi, baut sein eigenes WLAN auf, druckt Bons – ganz ohne Internet, Cloud oder IT-Personal.
 
-Läuft auf einem Raspberry Pi mit eigenem WLAN-Hotspot. Es ist kein Internet vor Ort nötig! 
-Mitarbeiter suchen Bestellungen per Handy oder Tablet, bestätigen die Abholung mit einem klick, und der Bon wird gedruckt.
+Entstanden beim Fischerfest der ASG Ettlingen. Weil 400 Vorbestellungen, drei Papierlisten und eine manuelle Kasseneingabe irgendwann nicht mehr lustig sind.
+
+---
+
+## Wie es läuft
+
+**Vorab (zuhause):** CSV aus eurem Vorbestellsystem exportieren, auf den Pi laden. Fertig.
+
+**Am Eventtag:** Pi starten, Drucker einstecken, Tablets ins WLAN – das war's. Der Pi baut sein eigenes WLAN-Netz auf, kein Router nötig.
+
+**An der Kasse:** Mitarbeiter suchen die Bestellung per Name, E-Mail oder Nummer. Ein Tap bestätigt die Abholung, der Bon wird gedruckt, alle Kassen synchronisieren sich sofort. Doppelt abholen ist nicht möglich.
+
+```mermaid
+graph LR
+    subgraph PREP["☁️  Vorbereitung"]
+        WC["📦 Vorbestellungsshop"]
+        CSV["📄 bestellungen.csv"]
+        WC -->|"SQL-Export"| CSV
+    end
+
+    subgraph PI["🖥️ Raspberry Pi 4 (offline)"]
+        DB[("💾 SQLite")]
+        APP["⚙️ vorbestellungs-kasse\nFastAPI · Uvicorn"]
+        HOTSPOT["📶 WLAN-Hotspot"]
+        DB <--> APP
+        APP <--> HOTSPOT
+    end
+
+    TAB1["📱 Tablet · Kasse 1"]
+    TAB2["📱 Tablet · Kasse 2"]
+    TAB3["📱 Smartphone · Kasse 3"]
+    PRINTER["🖨️ Epson TM-T20III"]
+
+    CSV -->|"Upload vor dem Event"| APP
+    HOTSPOT <-->|"WLAN"| TAB1
+    HOTSPOT <-->|"WLAN"| TAB2
+    HOTSPOT <-->|"WLAN"| TAB3
+    APP -->|"USB · ESC/POS"| PRINTER
+```
+
+<!-- TODO Screenshot: Suchmaske – ein paar Bestellkarten sichtbar, eine davon bereits abgeholt (ausgegraut) → docs/screenshots/suche.png -->
+
+<!-- TODO Screenshot: Bestellkarte geöffnet – Artikelliste, Gesamtsumme, Abholzeit, Abholen-Button → docs/screenshots/bestellung.png -->
+
+---
+
+## Für euren Verein
+
+Das System ist generisch gebaut – nicht nur für Fischerfeste.
+
+**CSV-Format anpassen:** zwei Formate werden unterstützt:
+
+| Format | Geeignet für | Beschreibung |
+|---|---|---|
+| `pivoted` _(Standard)_ | WooCommerce | Eine Zeile pro Bestellung, Produkte als Spaltenpaare `item_1`/`quantity_1` … |
+| `line_items` | Shopify, Pretix, Eventbrite | Eine Zeile pro Artikel, `order_id` wiederholt sich |
+
+Spaltennamen lassen sich einzeln anpassen. Details: → [docs/neuer-verein.md](docs/neuer-verein.md)
+
+**Namen und Jahr einstellen:** Drei Zeilen in einer `.env`-Datei:
+
+```env
+VEREINSNAME=Euer Verein
+EVENT_NAME=Euer Event
+EVENT_JAHR=2026
+```
+
+**Einmalig einrichten, jedes Jahr nutzen:** Nach dem ersten Setup startet der Pi autonom. Kein Wartungsaufwand zwischen den Events.
 
 ---
 
@@ -14,7 +79,7 @@ Mitarbeiter suchen Bestellungen per Handy oder Tablet, bestätigen die Abholung 
 - Automatischer Bondruck per ESC/POS (Epson TM-T20III)
 - Live-Sync aller Tablets über Server-Sent Events – kein Reload nötig
 - CSV-Import aus WooCommerce, Shopify, Pretix, Eventbrite und mehr
-- Kassenzettel mit Wechselgeldberechnung und Schnellbetragsauswahl
+- Wechselgeldberechnung mit Schnellbetragsauswahl
 - Vollständig offline – eigener WLAN-Hotspot
 
 ---
@@ -27,15 +92,34 @@ Mitarbeiter suchen Bestellungen per Handy oder Tablet, bestätigen die Abholung 
 | Epson TM-T20III (USB, 80 mm) | Bondrucker |
 | Tablets / Smartphones | Kassenoberfläche im Browser |
 
+<!-- TODO Foto: Hardware-Aufbau – Pi, Drucker und ein Tablet im echten Einsatz → docs/screenshots/hardware.jpg -->
+
 ---
 
-## Schnellstart (Entwicklung)
+## Quick Start / Lokal ausprobieren (kein Raspberry Pi nötig)
+
+Das System läuft auf jedem Laptop – ideal um es vor dem Event zu testen oder für einen anderen Verein anzupassen.
 
 ```bash
+git clone https://github.com/ASG-Ettlingen/fischverkauf.git
+cd fischverkauf
 uv sync --group dev
 cp .env.example .env
+```
+
+In `.env` den Druck deaktivieren:
+
+```env
+PRINTER_ENABLED=false
+```
+
+Server starten:
+
+```bash
 uv run uvicorn app.main:app --reload
 ```
+
+Dann [http://localhost:8000/admin](http://localhost:8000/admin) öffnen (Standard-User: `admin` PW: `bitte-aendern`), Beispiel-CSV herunterladen, importieren – und unter [http://localhost:8000](http://localhost:8000) ausprobieren.
 
 ```bash
 uv run pytest          # Tests
@@ -55,8 +139,6 @@ Ersteinrichtung (einmalig, mit Internet): → [docs/einrichtung.md](docs/einrich
 
 Vollständige Referenz aller `.env`-Variablen: → [docs/konfiguration.md](docs/konfiguration.md)
 
-Die wichtigsten Werte für euren Event:
-
 | Variable | Beispiel |
 |---|---|
 | `VEREINSNAME` | `ASG Ettlingen` |
@@ -70,5 +152,7 @@ Die wichtigsten Werte für euren Event:
 | Dokument | Inhalt |
 |---|---|
 | [Einrichtung (Raspberry Pi)](docs/einrichtung.md) | SD-Karte, SSH, Hotspot, systemd |
+| [Checkliste Eventtag](docs/eventtag.md) | Aufbau, CSV-Import, Abbau – zum Ausdrucken |
+| [Troubleshooting](docs/troubleshooting.md) | App, Hotspot, Drucker, Tablets |
 | [Für euren Verein anpassen](docs/neuer-verein.md) | Andere Shops, CSV-Formate, Fork |
 | [Konfigurationsreferenz](docs/konfiguration.md) | Alle `.env`-Variablen |
