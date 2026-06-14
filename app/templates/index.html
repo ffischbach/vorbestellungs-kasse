@@ -54,7 +54,8 @@ document.addEventListener('alpine:init', () => {
 
                 if (code) {
                     const s = code.data.trim();
-                    const orderId = /^\d+$/.test(s) ? s : (s.match(/\b(\d{3,})\b/) || [])[1] || null;
+                    const m = s.match(/\d+/);
+                    const orderId = m ? m[0] : null;
                     this.dbg = `✓ ${code.data}` + (orderId ? '' : ' – ID unklar');
                     if (orderId) {
                         this.closeScanner();
