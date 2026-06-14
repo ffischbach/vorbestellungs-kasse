@@ -75,12 +75,32 @@ python3 -m venv "$VENV_DIR"
 echo "      OK"
 
 # Datenverzeichnis anlegen
-echo "[4/7] Datenverzeichnis anlegen..."
+echo "[4/8] Datenverzeichnis anlegen..."
 mkdir -p "$INSTALL_DIR/data"
 echo "      OK"
 
+# SSL-Zertifikat generieren (nötig für Kamera-Zugriff im Browser)
+echo "[5/8] SSL-Zertifikat prüfen..."
+SSL_DIR="$INSTALL_DIR/data/ssl"
+mkdir -p "$SSL_DIR"
+if [ -f "$SSL_DIR/cert.pem" ] && [ -f "$SSL_DIR/key.pem" ]; then
+    EXPIRY=$(openssl x509 -enddate -noout -in "$SSL_DIR/cert.pem" 2>/dev/null | cut -d= -f2 || echo "unbekannt")
+    echo "      Zertifikat vorhanden (gültig bis: $EXPIRY) – übersprungen."
+    echo "      Zum Erneuern: rm -rf $SSL_DIR && bash scripts/prepare.sh"
+else
+    openssl req -x509 -newkey rsa:2048 -days 730 -nodes \
+        -keyout "$SSL_DIR/key.pem" \
+        -out "$SSL_DIR/cert.pem" \
+        -subj "/CN=${PI_HOSTNAME}" \
+        -addext "subjectAltName=DNS:${PI_HOSTNAME}.local,DNS:${PI_HOSTNAME},DNS:localhost,IP:10.42.0.1,IP:127.0.0.1" \
+        2>/dev/null
+    chmod 600 "$SSL_DIR/key.pem"
+    echo "      Zertifikat erstellt für: ${PI_HOSTNAME}.local (gültig 2 Jahre)"
+    echo "      HINWEIS: Beim ersten Aufruf im Browser 'Trotzdem fortfahren' klicken."
+fi
+
 # Aktuelle Konfiguration anzeigen
-echo "[5/7] Konfiguration..."
+echo "[6/8] Konfiguration..."
 echo "      PI_HOSTNAME   = $PI_HOSTNAME"
 echo "      HOTSPOT_SSID  = $HOTSPOT_SSID"
 echo "      EVENT_NAME    = $(_env_val EVENT_NAME)"
@@ -88,7 +108,7 @@ echo "      VEREINSNAME   = $(_env_val VEREINSNAME)"
 echo "      Zum Ändern: $INSTALL_DIR/.env bearbeiten, dann prepare.sh erneut ausführen."
 
 # WLAN-Hotspot einrichten (wird beim Booten automatisch aktiviert)
-echo "[6/7] WLAN-Hotspot einrichten..."
+echo "[7/8] WLAN-Hotspot einrichten..."
 if nmcli connection show Hotspot &>/dev/null; then
     echo "      Hotspot bereits konfiguriert – übersprungen."
     echo "      SSID: $(nmcli -g 802-11-wireless.ssid connection show Hotspot)"
@@ -105,7 +125,7 @@ else
 fi
 
 # systemd-Service installieren und für Auto-Start aktivieren
-echo "[7/7] systemd-Service installieren..."
+echo "[8/8] systemd-Service installieren..."
 sudo sed "s|/home/pi/vorbestellungs-kasse|$INSTALL_DIR|g" \
     "$INSTALL_DIR/systemd/$SERVICE_NAME.service" \
     | sudo tee /etc/systemd/system/$SERVICE_NAME.service > /dev/null
@@ -122,3 +142,10 @@ echo "  1. .env prüfen und ggf. anpassen"
 echo "  2. Pi einmal neu starten (Hostname + Drucker-Gruppe wirksam)"
 echo "  3. CSV-Datei mit Bestellungen bereitstellen"
 echo "  4. Am Eventtag: Pi starten – alles läuft automatisch. Optional: bash scripts/status.sh"
+echo ""
+echo "  HTTPS-Hinweis:"
+echo "  Tablets rufen die Kasse über https://${PI_HOSTNAME}.local:8000 auf."
+echo "  Beim ersten Besuch erscheint eine Browser-Warnung (selbst-signiertes Zertifikat)."
+echo "  → Chrome/Android: 'Erweitert' → '${PI_HOSTNAME}.local aufrufen'"
+echo "  → Safari/iOS:     'Details einblenden' → 'Website trotzdem besuchen'"
+echo "  Danach funktioniert die Kamera für den QR-Scanner."
