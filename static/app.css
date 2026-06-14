@@ -1319,3 +1319,169 @@ body {
   text-underline-offset: 2px;
 }
 .admin-link:hover { color: var(--foreground); }
+
+/* --- QR SCANNER --- */
+.search-row {
+  display: flex;
+  gap: var(--space-2);
+  align-items: stretch;
+}
+
+.search-row .input-search {
+  flex: 1;
+  min-width: 0;
+}
+
+.btn-qr {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  flex-shrink: 0;
+  border: 1px solid var(--input);
+  background: var(--card);
+  color: var(--foreground);
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: background-color 120ms ease, border-color 120ms ease;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.btn-qr:hover  { background: var(--muted); border-color: var(--foreground); }
+.btn-qr:active { background: var(--border); }
+
+.qr-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 400;
+  background: #000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  padding: var(--space-4);
+  padding-bottom: calc(var(--space-4) + env(safe-area-inset-bottom, 0px));
+}
+
+.qr-overlay__close {
+  position: absolute;
+  top: max(var(--space-4), env(safe-area-inset-top, var(--space-4)));
+  right: var(--space-4);
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+  cursor: pointer;
+  border-radius: 50%;
+  touch-action: manipulation;
+  -webkit-user-select: none;
+  user-select: none;
+  z-index: 1;
+  transition: background-color 120ms ease;
+}
+
+.qr-overlay__close:hover  { background: rgba(255, 255, 255, 0.25); }
+.qr-overlay__close:active { background: rgba(255, 255, 255, 0.35); }
+
+.qr-video-container {
+  position: relative;
+  width: 100%;
+  max-width: min(80vw, 80vh, 480px);
+  aspect-ratio: 1;
+  overflow: hidden;
+  background: #111;
+  border-radius: 4px;
+}
+
+.qr-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.qr-canvas { display: none; }
+
+.qr-viewfinder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.qr-viewfinder__frame {
+  position: relative;
+  width: 62%;
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.qr-viewfinder__corner {
+  position: absolute;
+  width: 28px;
+  height: 28px;
+  border-style: solid;
+  border-color: rgba(255, 255, 255, 0.9);
+  transition: border-color 200ms ease;
+}
+
+.qr-viewfinder__corner--tl { top: 0;    left: 0;   border-width: 3px 0 0 3px; }
+.qr-viewfinder__corner--tr { top: 0;    right: 0;  border-width: 3px 3px 0 0; }
+.qr-viewfinder__corner--bl { bottom: 0; left: 0;   border-width: 0 0 3px 3px; }
+.qr-viewfinder__corner--br { bottom: 0; right: 0;  border-width: 0 3px 3px 0; }
+
+.qr-viewfinder--found .qr-viewfinder__corner {
+  border-color: #22c55e;
+}
+
+.qr-viewfinder__check {
+  font-size: 48px;
+  line-height: 1;
+  color: #22c55e;
+  font-weight: 700;
+  text-shadow: 0 0 20px rgba(34, 197, 94, 0.6);
+}
+
+.qr-hint {
+  margin-top: var(--space-5);
+  font-size: var(--text-base);
+  font-weight: var(--font-medium);
+  color: rgba(255, 255, 255, 0.7);
+  text-align: center;
+  max-width: 280px;
+  line-height: 1.5;
+  transition: color 200ms ease;
+}
+
+.qr-hint--found { color: #22c55e; font-weight: var(--font-bold); }
+.qr-hint--error { color: #f87171; }
+
+.qr-cancel {
+  margin-top: var(--space-6);
+  padding: var(--space-3) var(--space-8);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: transparent;
+  color: rgba(255, 255, 255, 0.7);
+  font-family: var(--font-family);
+  font-size: var(--text-base);
+  font-weight: var(--font-semibold);
+  cursor: pointer;
+  touch-action: manipulation;
+  min-height: 48px;
+  transition: background-color 150ms ease, color 150ms ease;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.qr-cancel:hover  { background: rgba(255, 255, 255, 0.1); color: #fff; }
+.qr-cancel:active { background: rgba(255, 255, 255, 0.18); }
