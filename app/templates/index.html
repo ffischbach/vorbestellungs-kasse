@@ -48,30 +48,27 @@ document.addEventListener('alpine:init', () => {
                 const ctx = canvas.getContext('2d');
                 ctx.drawImage(video, 0, 0);
                 const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-                try {
-                    const code = jsQR(imageData.data, imageData.width, imageData.height, {
-                        inversionAttempts: 'attemptBoth'
-                    });
-                    this.dbg = `${canvas.width}×${canvas.height} | ${code ? '✓ ' + code.data : 'kein Code'}`;
-                    if (code) { this.onFound(code.data, video); return; }
-                } catch (e) {
-                    this.dbg = 'jsQR Fehler: ' + e.message;
+                let code = null;
+                try { code = jsQR(imageData.data, imageData.width, imageData.height, { inversionAttempts: 'attemptBoth' }); }
+                catch (e) { this.dbg = 'jsQR Fehler: ' + e.message; this.scheduleNext(video); return; }
+
+                if (code) {
+                    const s = code.data.trim();
+                    const orderId = /^\d+$/.test(s) ? s : (s.match(/\b(\d{3,})\b/) || [])[1] || null;
+                    this.dbg = `✓ ${code.data}` + (orderId ? '' : ' – ID unklar');
+                    if (orderId) {
+                        this.closeScanner();
+                        const input = document.querySelector('[name=q]');
+                        if (input) { input.value = orderId; htmx.trigger(input, 'input'); input.focus(); }
+                        return;
+                    }
+                } else {
+                    this.dbg = `${canvas.width}×${canvas.height} | kein Code`;
                 }
             } else {
                 this.dbg = `warte... readyState=${video.readyState} ${video.videoWidth}×${video.videoHeight}`;
             }
             this.scheduleNext(video);
-        },
-
-        onFound(raw, video) {
-            const s = raw.trim();
-            const orderId = /^\d+$/.test(s) ? s : (s.match(/\b(\d{3,})\b/) || [])[1] || null;
-            if (!orderId) { this.dbg = 'ID unklar: ' + JSON.stringify(raw); this.scheduleNext(video); return; }
-            this.status = 'found';
-            setTimeout(() => {
-                this.closeScanner();
-                this.$dispatch('switch-to-order', { orderId });
-            }, 600);
         },
 
         closeScanner() {
