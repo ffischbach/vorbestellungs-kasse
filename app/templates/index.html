@@ -12,7 +12,7 @@ document.addEventListener('alpine:init', () => {
         open: false,
         status: 'idle',
         stream: null,
-        rafId: null,
+        timerId: null,
 
         async openScanner() {
             this.open = true;
@@ -25,16 +25,20 @@ document.addEventListener('alpine:init', () => {
                 });
                 video.srcObject = this.stream;
                 await video.play();
-                this.tick(video);
+                this.scheduleNext(video);
             } catch {
                 this.status = 'error';
             }
         },
 
+        scheduleNext(video) {
+            this.timerId = setTimeout(() => this.tick(video), 200);
+        },
+
         tick(video) {
             if (!this.open || this.status !== 'scanning') return;
 
-            if (video.readyState >= 2) {
+            if (video.readyState >= 2 && video.videoWidth > 0) {
                 const canvas = this.$refs.qrCanvas;
                 canvas.width = video.videoWidth;
                 canvas.height = video.videoHeight;
@@ -44,34 +48,15 @@ document.addEventListener('alpine:init', () => {
                 const code = jsQR(imageData.data, imageData.width, imageData.height, {
                     inversionAttempts: 'attemptBoth'
                 });
-                if (code) { this.onFound(code.data); return; }
+                if (code) { this.onFound(code.data, video); return; }
             }
-            this.rafId = requestAnimationFrame(() => this.tick(video));
+            this.scheduleNext(video);
         },
 
-        extractId(raw) {
+        onFound(raw, video) {
             const s = raw.trim();
-            if (/^\d+$/.test(s)) return s;
-            try {
-                const u = new URL(s);
-                const segs = u.pathname.split('/').filter(Boolean);
-                for (let i = segs.length - 1; i >= 0; i--) {
-                    if (/^\d+$/.test(segs[i])) return segs[i];
-                }
-                for (const [, v] of u.searchParams) {
-                    if (/^\d+$/.test(v)) return v;
-                }
-            } catch {}
-            const m = s.match(/\b(\d{3,})\b/);
-            return m ? m[1] : null;
-        },
-
-        onFound(raw) {
-            const orderId = this.extractId(raw);
-            if (!orderId) {
-                this.rafId = requestAnimationFrame(() => this.tick(this.$refs.qrVideo));
-                return;
-            }
+            const orderId = /^\d+$/.test(s) ? s : (s.match(/\b(\d{3,})\b/) || [])[1] || null;
+            if (!orderId) { this.scheduleNext(video); return; }
             this.status = 'found';
             setTimeout(() => {
                 this.closeScanner();
@@ -82,7 +67,7 @@ document.addEventListener('alpine:init', () => {
         closeScanner() {
             this.open = false;
             this.status = 'idle';
-            if (this.rafId) { cancelAnimationFrame(this.rafId); this.rafId = null; }
+            if (this.timerId) { clearTimeout(this.timerId); this.timerId = null; }
             if (this.stream) { this.stream.getTracks().forEach(t => t.stop()); this.stream = null; }
         }
     }));
