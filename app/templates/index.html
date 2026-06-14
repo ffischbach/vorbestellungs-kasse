@@ -9,6 +9,7 @@ document.addEventListener('alpine:init', () => {
     });
 });
 </script>
+
 <div class="mb-4">
     <div
         id="stats"
@@ -41,13 +42,12 @@ document.addEventListener('alpine:init', () => {
     </div>
 
     <div x-show="tab === 'search'">
-        <div class="card mb-4" style="padding:0; overflow:hidden;">
+        <div class="search-sticky">
             <input
                 type="search"
                 name="q"
                 placeholder="Name, E-Mail oder Bestellnummer …"
                 class="input-search"
-                style="border:none; border-radius:var(--radius-lg);"
                 hx-get="/orders/search"
                 hx-trigger="input changed delay:200ms, search"
                 hx-target="#results"
