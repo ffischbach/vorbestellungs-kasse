@@ -7,7 +7,7 @@ Wants=NetworkManager.service
 Type=simple
 User=pi
 WorkingDirectory=/home/pi/vorbestellungs-kasse
-ExecStart=/home/pi/vorbestellungs-kasse/.venv/bin/uvicorn app.main:app --host 0.0.0.0 --port 8000
+ExecStart=/home/pi/vorbestellungs-kasse/.venv/bin/uvicorn app.main:app --host 0.0.0.0 --port 8000 --ssl-keyfile /home/pi/vorbestellungs-kasse/data/ssl/key.pem --ssl-certfile /home/pi/vorbestellungs-kasse/data/ssl/cert.pem
 Restart=on-failure
 RestartSec=5
 # Maximal 5 Neustarts in 60 Sekunden – verhindert Restart-Sturm bei dauerhaftem Fehler
