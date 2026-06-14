@@ -13,12 +13,10 @@ document.addEventListener('alpine:init', () => {
         status: 'idle',
         stream: null,
         timerId: null,
-        dbg: '',
 
         async openScanner() {
             this.open = true;
             this.status = 'scanning';
-            this.dbg = '';
             await this.$nextTick();
             const video = this.$refs.qrVideo;
             try {
@@ -27,47 +25,45 @@ document.addEventListener('alpine:init', () => {
                 });
                 video.srcObject = this.stream;
                 await video.play();
+                this._onVisibility = () => {
+                    if (document.hidden) { clearTimeout(this.timerId); this.timerId = null; }
+                    else if (this.open && this.status === 'scanning' && !this.timerId) this.scheduleNext(video);
+                };
+                document.addEventListener('visibilitychange', this._onVisibility);
                 this.scheduleNext(video);
-            } catch (e) {
+            } catch {
                 this.status = 'error';
-                this.dbg = 'getUserMedia: ' + e.message;
             }
         },
 
         scheduleNext(video) {
-            this.timerId = setTimeout(() => this.tick(video), 200);
+            this.timerId = setTimeout(() => this.tick(video), 500);
         },
 
         tick(video) {
             if (!this.open || this.status !== 'scanning') return;
+            this.timerId = null;
 
             if (video.readyState >= 2 && video.videoWidth > 0) {
                 const canvas = this.$refs.qrCanvas;
-                canvas.width = video.videoWidth;
-                canvas.height = video.videoHeight;
+                const scale = Math.min(1, 640 / Math.max(video.videoWidth, video.videoHeight));
+                canvas.width = Math.round(video.videoWidth * scale);
+                canvas.height = Math.round(video.videoHeight * scale);
                 const ctx = canvas.getContext('2d');
-                ctx.drawImage(video, 0, 0);
+                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
                 const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
                 let code = null;
                 try { code = jsQR(imageData.data, imageData.width, imageData.height, { inversionAttempts: 'attemptBoth' }); }
-                catch (e) { this.dbg = 'jsQR Fehler: ' + e.message; this.scheduleNext(video); return; }
-
+                catch {}
                 if (code) {
-                    const s = code.data.trim();
-                    const m = s.match(/\d+/);
-                    const orderId = m ? m[0] : null;
-                    this.dbg = `✓ ${code.data}` + (orderId ? '' : ' – ID unklar');
+                    const orderId = code.data.trim();
                     if (orderId) {
                         this.closeScanner();
                         const input = document.querySelector('[name=q]');
                         if (input) { input.value = orderId; htmx.trigger(input, 'input'); input.focus(); }
                         return;
                     }
-                } else {
-                    this.dbg = `${canvas.width}×${canvas.height} | kein Code`;
                 }
-            } else {
-                this.dbg = `warte... readyState=${video.readyState} ${video.videoWidth}×${video.videoHeight}`;
             }
             this.scheduleNext(video);
         },
@@ -75,8 +71,8 @@ document.addEventListener('alpine:init', () => {
         closeScanner() {
             this.open = false;
             this.status = 'idle';
-            this.dbg = '';
             if (this.timerId) { clearTimeout(this.timerId); this.timerId = null; }
+            if (this._onVisibility) { document.removeEventListener('visibilitychange', this._onVisibility); this._onVisibility = null; }
             if (this.stream) { this.stream.getTracks().forEach(t => t.stop()); this.stream = null; }
         }
     }));
@@ -177,7 +173,6 @@ document.addEventListener('alpine:init', () => {
                    :class="{ 'qr-hint--found': status === 'found', 'qr-hint--error': status === 'error' }"
                    x-text="status === 'found' ? 'Bestellung gefunden!' : status === 'error' ? 'Kamera konnte nicht geöffnet werden.' : 'QR-Code der Bestellung in die Kamera halten'">
                 </p>
-                <p x-show="dbg" x-text="dbg" style="color:#fff;font-size:11px;opacity:.7;margin-top:6px;word-break:break-all;text-align:center;padding:0 12px"></p>
 
                 <button class="qr-cancel" @click="closeScanner()" type="button">
                     Abbrechen
