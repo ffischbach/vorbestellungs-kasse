@@ -34,18 +34,6 @@ document.addEventListener('alpine:init', () => {
         tick(video) {
             if (!this.open || this.status !== 'scanning') return;
 
-            if (window.__qrDetector) {
-                window.__qrDetector.detect(video)
-                    .then(codes => {
-                        if (codes.length > 0) this.onFound(codes[0].rawValue);
-                        else this.rafId = requestAnimationFrame(() => this.tick(video));
-                    })
-                    .catch(() => {
-                        this.rafId = requestAnimationFrame(() => this.tick(video));
-                    });
-                return;
-            }
-
             if (video.readyState >= 2) {
                 const canvas = this.$refs.qrCanvas;
                 canvas.width = video.videoWidth;
@@ -54,7 +42,7 @@ document.addEventListener('alpine:init', () => {
                 ctx.drawImage(video, 0, 0);
                 const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
                 const code = jsQR(imageData.data, imageData.width, imageData.height, {
-                    inversionAttempts: 'dontInvert'
+                    inversionAttempts: 'attemptBoth'
                 });
                 if (code) { this.onFound(code.data); return; }
             }
@@ -100,9 +88,6 @@ document.addEventListener('alpine:init', () => {
     }));
 });
 
-if ('BarcodeDetector' in window) {
-    try { window.__qrDetector = new BarcodeDetector({ formats: ['qr_code'] }); } catch {}
-}
 </script>
 
 <div class="mb-4">
