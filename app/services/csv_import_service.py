@@ -120,7 +120,7 @@ class CsvImportService:
                     except ValueError:
                         pass
             first_row = rows[0]
-            if settings.csv_col_line_price and line_price_total > 0:
+            if settings.csv_col_line_price:
                 first_row = dict(first_row)
                 first_row[settings.csv_col_total] = str(round(line_price_total, 2))
             orders.append(_build_order(first_row, items))
