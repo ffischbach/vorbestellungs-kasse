@@ -45,11 +45,19 @@ def _build_order(row: dict, items: list[dict]) -> Order:
     customer_id_raw = _val(row.get("customer_id"))
     num_items_raw = _val(row.get("num_items_sold"))
     returning_raw = _val(row.get("returning_customer"))
+    first_name_raw = (row.get(settings.csv_col_first_name) or "").strip()
+    last_name_raw = (row.get(settings.csv_col_last_name) or "").strip()
+    if last_name_raw:
+        first_name, last_name = first_name_raw, last_name_raw
+    else:
+        parts = first_name_raw.split(None, 1)
+        first_name = parts[0] if parts else ""
+        last_name = parts[1] if len(parts) > 1 else ""
     return Order(
-        order_id=int(row[settings.csv_col_order_id]),
+        order_id=row[settings.csv_col_order_id].strip(),
         net_total=float(row[settings.csv_col_total]),
-        first_name=row[settings.csv_col_first_name].strip(),
-        last_name=row[settings.csv_col_last_name].strip(),
+        first_name=first_name,
+        last_name=last_name,
         email=row[settings.csv_col_email].strip().lower(),
         customer_id=int(customer_id_raw) if customer_id_raw else None,
         abholzeit=_val(row.get(settings.csv_col_timeslot)),
@@ -89,23 +97,33 @@ class CsvImportService:
         return orders
 
     def _parse_line_items(self, reader: csv.DictReader) -> list[Order]:  # type: ignore[type-arg]
-        groups: dict[int, list[dict]] = defaultdict(list)
+        groups: dict[str, list[dict]] = defaultdict(list)
         for row in reader:
-            order_id = int(row[settings.csv_col_order_id])
+            order_id = row[settings.csv_col_order_id].strip()
             groups[order_id].append(row)
 
         orders = []
         for rows in groups.values():
             items = []
+            line_price_total = 0.0
             for row in rows:
                 name = _val(row.get(settings.csv_col_item_name))
                 qty_raw = _val(row.get(settings.csv_col_item_quantity))
                 if name and qty_raw:
                     try:
-                        items.append({"name": name, "quantity": int(qty_raw)})
+                        qty = int(qty_raw)
+                        items.append({"name": name, "quantity": qty})
+                        if settings.csv_col_line_price:
+                            price_raw = _val(row.get(settings.csv_col_line_price))
+                            if price_raw:
+                                line_price_total += float(price_raw) * qty
                     except ValueError:
                         pass
-            orders.append(_build_order(rows[0], items))
+            first_row = rows[0]
+            if settings.csv_col_line_price and line_price_total > 0:
+                first_row = dict(first_row)
+                first_row[settings.csv_col_total] = str(round(line_price_total, 2))
+            orders.append(_build_order(first_row, items))
         return orders
 
     def import_to_db(self, content: str, db: Session, replace: bool = True) -> int:

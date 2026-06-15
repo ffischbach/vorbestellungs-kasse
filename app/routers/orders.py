@@ -72,7 +72,7 @@ async def overview(request: Request, db: Session = Depends(get_db)) -> HTMLRespo
 
 @router.get("/orders/{order_id}/card", response_class=HTMLResponse)
 async def order_card(
-    request: Request, order_id: int, db: Session = Depends(get_db)
+    request: Request, order_id: str, db: Session = Depends(get_db)
 ) -> HTMLResponse:
     service = OrderService(db)
     try:
@@ -83,7 +83,7 @@ async def order_card(
 
 
 @router.post("/orders/{order_id}/pickup", response_class=HTMLResponse)
-async def pickup(request: Request, order_id: int, db: Session = Depends(get_db)) -> HTMLResponse:
+async def pickup(request: Request, order_id: str, db: Session = Depends(get_db)) -> HTMLResponse:
     service = OrderService(db)
     try:
         order, printer_error = service.pickup(order_id)
@@ -100,7 +100,7 @@ async def pickup(request: Request, order_id: int, db: Session = Depends(get_db))
 
 
 @router.post("/orders/{order_id}/handout", response_class=HTMLResponse)
-async def handout(request: Request, order_id: int, db: Session = Depends(get_db)) -> HTMLResponse:
+async def handout(request: Request, order_id: str, db: Session = Depends(get_db)) -> HTMLResponse:
     service = OrderService(db)
     try:
         service.hand_out(order_id)
@@ -119,7 +119,7 @@ async def handout(request: Request, order_id: int, db: Session = Depends(get_db)
 
 
 @router.post("/orders/{order_id}/reprint", response_class=HTMLResponse)
-async def reprint(request: Request, order_id: int, db: Session = Depends(get_db)) -> HTMLResponse:
+async def reprint(request: Request, order_id: str, db: Session = Depends(get_db)) -> HTMLResponse:
     service = OrderService(db)
     try:
         order, printer_error = service.reprint(order_id)

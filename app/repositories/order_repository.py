@@ -16,12 +16,11 @@ class OrderRepository:
             Order.first_name.ilike(q),
             Order.last_name.ilike(q),
             Order.email.ilike(q),
+            Order.order_id.ilike(q),
         ]
-        if query.isdigit():
-            filters.append(Order.order_id == int(query))
         return self.db.query(Order).filter(or_(*filters)).all()
 
-    def get_by_order_id(self, order_id: int) -> Order | None:
+    def get_by_order_id(self, order_id: str) -> Order | None:
         return self.db.query(Order).filter(Order.order_id == order_id).first()
 
     def get_all(self) -> list[Order]:

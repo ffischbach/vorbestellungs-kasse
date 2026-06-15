@@ -47,6 +47,9 @@ class Settings(BaseSettings):
     # Line-Items-Format (Shopify, Pretix, …)
     csv_col_item_name: str = "item_name"
     csv_col_item_quantity: str = "quantity"
+    # Wenn gesetzt: Stückpreis-Spalte für line_items – Gesamtsumme wird als sum(Preis×Menge) berechnet.
+    # Leer lassen wenn die Spalte csv_col_total bereits die Bestellsumme enthält (WooCommerce-Verhalten).
+    csv_col_line_price: str = ""
 
 
 settings = Settings()

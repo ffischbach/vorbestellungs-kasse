@@ -62,13 +62,13 @@ class OrderService:
     def get_recent_pickups(self, limit: int = 15) -> list[Order]:
         return self.repo.get_recent_pickups(limit)
 
-    def get_by_id(self, order_id: int) -> Order:
+    def get_by_id(self, order_id: str) -> Order:
         order = self.repo.get_by_order_id(order_id)
         if not order:
             raise OrderNotFoundError(f"Bestellung #{order_id} nicht gefunden")
         return order
 
-    def reprint(self, order_id: int) -> tuple[Order, str | None]:
+    def reprint(self, order_id: str) -> tuple[Order, str | None]:
         """Reprints the receipt for a picked-up order. Returns (order, printer_error)."""
         order = self.repo.get_by_order_id(order_id)
         if not order:
@@ -82,7 +82,7 @@ class OrderService:
 
         return order, printer_error
 
-    def pickup(self, order_id: int) -> tuple[Order, str | None]:
+    def pickup(self, order_id: str) -> tuple[Order, str | None]:
         """Marks order as picked up and prints receipt. Returns (order, printer_error)."""
         order = self.repo.get_by_order_id(order_id)
         if not order:
@@ -100,7 +100,7 @@ class OrderService:
 
         return order, printer_error
 
-    def hand_out(self, order_id: int) -> Order:
+    def hand_out(self, order_id: str) -> Order:
         """Marks order as handed out. Returns updated order."""
         order = self.repo.get_by_order_id(order_id)
         if not order:

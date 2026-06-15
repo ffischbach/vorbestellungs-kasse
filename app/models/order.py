@@ -12,7 +12,7 @@ class Order(Base):
     __tablename__ = "orders"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    order_id: Mapped[int] = mapped_column(Integer, unique=True, nullable=False, index=True)
+    order_id: Mapped[str] = mapped_column(String, unique=True, nullable=False, index=True)
     net_total: Mapped[Decimal] = mapped_column(Numeric(10, 2), nullable=False)
     first_name: Mapped[str] = mapped_column(String, nullable=False)
     last_name: Mapped[str] = mapped_column(String, nullable=False)

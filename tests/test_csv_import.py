@@ -25,7 +25,7 @@ def test_parse_real_export_format() -> None:
     orders = service.parse(SAMPLE_TSV)
     assert len(orders) == 1
     order = orders[0]
-    assert order.order_id == 2055
+    assert order.order_id == "2055"
     assert float(order.net_total) == 92.5
     assert order.first_name == "Max"
     assert order.last_name == "Mustermann"
