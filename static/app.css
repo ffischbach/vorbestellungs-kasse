@@ -209,6 +209,11 @@ body {
   text-align: right;
 }
 
+@media (max-width: 479px) {
+  .app-header__title { display: none; }
+  .app-header__clock { display: none; }
+}
+
 /* --- AUSGABE GRID + COMPACT CARD --- */
 .ausgabe-grid {
   display: grid;
