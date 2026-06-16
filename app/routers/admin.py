@@ -11,6 +11,7 @@ from app.database import get_db
 from app.jinja import templates
 from app.repositories.order_repository import OrderRepository
 from app.services.csv_import_service import CsvImportService
+from app.services.order_service import OrderService
 
 router = APIRouter(prefix="/admin", tags=["admin"])
 _security = HTTPBasic()
@@ -59,6 +60,14 @@ async def import_csv(
         return templates.TemplateResponse(
             request, "partials/import_result.html", {"error": str(e)}, status_code=400
         )
+
+
+@router.get("/kassenabschluss", response_class=HTMLResponse, dependencies=[Depends(_require_admin)])
+async def kassenabschluss(request: Request, db: Session = Depends(get_db)) -> HTMLResponse:
+    data = OrderService(db).get_cash_audit()
+    return templates.TemplateResponse(
+        request, "kassenabschluss.html", {**data, "active_page": "kassenabschluss"}
+    )
 
 
 @router.delete("/reset", response_class=HTMLResponse, dependencies=[Depends(_require_admin)])
