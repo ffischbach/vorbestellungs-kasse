@@ -36,6 +36,14 @@ class OrderRepository:
             .all()
         )
 
+    def get_paid_orders(self) -> list[Order]:
+        return (
+            self.db.query(Order)
+            .filter(Order.picked_up.is_(True))
+            .order_by(Order.last_name, Order.first_name)
+            .all()
+        )
+
     def get_recent_pickups(self, limit: int = 15) -> list[Order]:
         return (
             self.db.query(Order)

@@ -59,6 +59,25 @@ class OrderService:
             key=lambda x: -x["quantity"],
         )
 
+    def get_cash_audit(self) -> dict:
+        paid = self.repo.get_paid_orders()
+        product_totals: dict[str, int] = {}
+        for order in paid:
+            for item in order.items:
+                name = item.get("name", "")
+                qty = int(item.get("quantity", 0))
+                if name:
+                    product_totals[name] = product_totals.get(name, 0) + qty
+        return {
+            "kassensaldo": sum(o.net_total for o in paid),
+            "stats": self.repo.count(),
+            "product_totals": sorted(
+                [{"name": k, "quantity": v} for k, v in product_totals.items()],
+                key=lambda x: -x["quantity"],
+            ),
+            "open_orders": self.repo.get_open_orders(),
+        }
+
     def get_recent_pickups(self, limit: int = 15) -> list[Order]:
         return self.repo.get_recent_pickups(limit)
 
